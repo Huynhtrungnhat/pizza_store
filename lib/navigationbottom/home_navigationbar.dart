@@ -51,7 +51,7 @@ class _CurveBarState extends State<CurveBar> {
           // navigationBar colors
           color: Color.fromARGB(255, 16, 127, 144),
           //selected times colors
-          buttonBackgroundColor: const Color.fromARGB(255, 241, 41, 6),
+          buttonBackgroundColor: Color.fromARGB(255, 55, 14, 6),
           backgroundColor: Colors.transparent,
           items: items,
           height: 60,

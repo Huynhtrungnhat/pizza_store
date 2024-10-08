@@ -6,7 +6,7 @@ class shophistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
-      backgroundColor: Color.fromARGB(255, 201, 233, 22),
+      backgroundColor: Color.fromARGB(255, 118, 126, 74),
       appBar: AppBar(
         title: const Text("Lịch sử mua hàng"),
         centerTitle: true,

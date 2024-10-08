@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(77, 38, 167, 79)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(77, 29, 102, 52)),
         useMaterial3: true,
       ),
       home: CurveBar(),

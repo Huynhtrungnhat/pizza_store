@@ -8,7 +8,7 @@ class SearchPage extends StatelessWidget {
     return  Scaffold(
       backgroundColor: Color.fromARGB(255, 22, 233, 222),
       appBar: AppBar(
-        title: const Text("Đơn hàng mua của bạn "),
+        title: const Text("Đơn hàng mua "),
         centerTitle: true,
       ),
       body: Center(
