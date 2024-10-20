@@ -39,7 +39,10 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   marquee: ^2.2.3
   flutter_zoom_drawer: ^3.1.1
-  cupertino_icons: ^1.0.6
+  async: ^2.11.0
+  http: ^1.2.1
+  carousel_slider: ^5.0.0
+  
 
 dev_dependencies:
   flutter_test:
