@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
+import 'package:pizza_store/screen/manhinhchung.dart';
 
 import '../screen/cartsp.dart';
 
@@ -17,16 +20,15 @@ class _detailsanphamState extends State<detailsanpham> {
    final Cart cart = Cart();
   Future<List> getData() async {
   // var url = Uri.parse("http://localhost:8000/api/sanpham");
-
+  log('${AppConstants.BASE_URL}/sanpham');
   final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/sanpham'),
+      Uri.parse('${AppConstants.BASE_URL}/sanpham'),
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     );
-
-  if (response.statusCode == 200) {
+  if (response.statusCode == 201) {
     var data = json.decode(response.body);
     return data['data']; // Giả sử dữ liệu bạn cần nằm trong thuộc tính 'data'
   } else {
@@ -48,7 +50,8 @@ class _detailsanphamState extends State<detailsanpham> {
             return Center(child: Text('Lỗi: ${snapshot.error}'));
           }
           return snapshot.hasData
-              ? ItemList(list: snapshot.data!, cart: cart)
+              ? Screenn(list: snapshot.data!)
+                
               : Center(child: CircularProgressIndicator());
         },
       ),

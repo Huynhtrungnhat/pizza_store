@@ -1,10 +1,13 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:pizza_store/models/sanphamcart.dart';
 
 import 'package:pizza_store/navigationbottom/donhang_page.dart';
 import 'package:pizza_store/home/home_page.dart';
 import 'package:pizza_store/navigationbottom/profile_page.dart';
 import 'package:pizza_store/navigationbottom/shopcash.dart';
+import 'package:pizza_store/screen/addsanpham.dart';
+import 'package:pizza_store/screen/tranggiohang.dart';
 
 import '../home/sanpham.dart';
 
@@ -17,12 +20,11 @@ class CurveBar extends StatefulWidget {
 
 class _CurveBarState extends State<CurveBar> {
   int index = 0;
-  final screen = const [
-  detailsanpham(),
-   SearchPage(),
-   ProfilePage(),
-   shophistory(),
-   
+  final screen = [
+    detailsanpham(),
+    AddProductPage(),
+    shophistory(),
+    CartPage(),
   ];
 
   @override
