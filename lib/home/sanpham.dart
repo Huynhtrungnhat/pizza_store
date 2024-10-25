@@ -52,7 +52,7 @@ class _detailsanphamState extends State<detailsanpham> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Sản phẩm"),
+        title: Text("Trang chủ Thực đơn"),
       ),
       body: FutureBuilder<List>(
         future: getData(),
@@ -72,7 +72,7 @@ class _detailsanphamState extends State<detailsanpham> {
           FloatingActionButton(
             onPressed: _incrementCounter,
             tooltip: 'Giỏ Hàng',
-            child: const Icon(Icons.add),
+            child: const Icon(Icons.shopping_cart_rounded),
           ),
           Positioned(
             right: 0,
