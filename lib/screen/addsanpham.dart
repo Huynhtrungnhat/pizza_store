@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/models/modeladdsanpham.dart';
+import 'package:pizza_store/screen/productadd.dart';
 
 class AddProductPage extends StatefulWidget {
   @override
@@ -10,10 +12,11 @@ class AddProductPage extends StatefulWidget {
 }
 
 class _AddProductPageState extends State<AddProductPage> {
-  final TextEditingController _productNameController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _stockController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController motaController = TextEditingController();
+  final TextEditingController giaController = TextEditingController();
+  final TextEditingController soluongtonkhoController = TextEditingController();
+  
 
   String? _categoryId;
   String? _subCategoryId;
@@ -41,53 +44,6 @@ class _AddProductPageState extends State<AddProductPage> {
       );
     }
   }
-
-  Future<void> _addProduct() async {
-    String apiUrl = AppConstants.ALL_PRODUCT_URI;
-
-    var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-    request.fields['ten_san_pham'] = _productNameController.text;
-    request.fields['mo_ta'] = _descriptionController.text;
-    request.fields['gia'] = _priceController.text;
-    request.fields['so_luong_ton_kho'] = _stockController.text;
-    request.fields['ma_loai_san_pham'] = _categoryId ?? '';
-    request.fields['ma_loai'] = _subCategoryId ?? '';
-
-    if (_selectedImage != null) {
-      try {
-        request.files.add(
-          await http.MultipartFile.fromPath('hinh_anh', _selectedImage!.path),
-        );
-      } catch (e) {
-        print("Error adding image to request: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Có lỗi xảy ra khi thêm ảnh')),
-        );
-        return;
-      }
-    }
-
-    try {
-      final response = await request.send();
-      print("Status code: ${response.statusCode}");
-
-      if (response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thêm sản phẩm thành công')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Thêm sản phẩm thất bại')),
-        );
-      }
-    } catch (e) {
-      print("Error adding product: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Có lỗi xảy ra khi thêm sản phẩm')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,58 +78,29 @@ class _AddProductPageState extends State<AddProductPage> {
               ),
               SizedBox(height: 16),
               TextField(
-                controller: _productNameController,
+                controller: nameController,
                 decoration: InputDecoration(labelText: 'Tên sản phẩm'),
               ),
               TextField(
-                controller: _descriptionController,
+                controller: giaController,
                 decoration: InputDecoration(labelText: 'Mô tả'),
               ),
               TextField(
-                controller: _priceController,
+                controller: motaController,
                 decoration: InputDecoration(labelText: 'Giá'),
                 keyboardType: TextInputType.number,
               ),
               TextField(
-                controller: _stockController,
+                controller: soluongtonkhoController,
                 decoration: InputDecoration(labelText: 'Số lượng tồn kho'),
                 keyboardType: TextInputType.number,
               ),
-              DropdownButton<String>(
-                value: _categoryId,
-                hint: Text('Chọn mã loại sản phẩm'),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _categoryId = newValue;
-                  });
-                },
-                items: <String>['1', '2', '3']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              DropdownButton<String>(
-                value: _subCategoryId,
-                hint: Text('Chọn mã loại'),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _subCategoryId = newValue;
-                  });
-                },
-                items: <String>['1', '2', '3']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
+              
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _addProduct,
+               ElevatedButton(
+                onPressed: (){
+                  Myaddproduct().Addproducrtdata(nameController.text.toString(), motaController.text.toString(), giaController.text.toString(), soluongtonkhoController.text.toString());
+                },
                 child: Text('Thêm sản phẩm'),
               ),
             ],

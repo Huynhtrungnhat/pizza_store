@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/home/sanpham.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
 import 'package:pizza_store/models/sanphammodel.dart';
 
@@ -14,6 +15,7 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
+  var sdf=0;
 
   void incrementQuantity() {
     int stock = widget.product['so_luong_ton_kho'] ?? 0;
@@ -48,13 +50,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     );
 
     cart.addsanpham(product);
+     print('Tổng số lượng sản phẩm trong giỏ hàng: ');
+     setState(() {
+        sdf=cart.getTotalQuantity();
+     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Đã thêm ${widget.product['ten_san_pham']} vào giỏ hàng!'),
+        content: Text('Đã thêm ${cart.getTotalQuantity()}'),
         duration: Duration(seconds: 2),
       ),
+
     );
+   Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => detailsanpham()),
+              (Route<dynamic> route) => false, // Xóa tất cả các trang trước đó
+            );
   }
 
   @override

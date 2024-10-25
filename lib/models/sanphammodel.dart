@@ -3,7 +3,8 @@ class Product {
   final String ten_san_pham;
   final double gia;
   final String mo_ta;
-  final int so_luong_ton_kho;
+   int so_luong_ton_kho;
+
   
 
   Product({
@@ -14,7 +15,6 @@ class Product {
     required this.so_luong_ton_kho,
   });
   
-  // Phương thức để tạo đối tượng Product từ JSON
   // factory Product.fromJson(Map<String, dynamic> json) {
   //   return Product(
   //     hinh_anh: json['hinh_anh'] ?? '',
