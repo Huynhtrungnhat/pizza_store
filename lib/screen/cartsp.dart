@@ -29,7 +29,6 @@ class ItemList extends StatelessWidget {
         final product = list[index];
         return GestureDetector(
           onTap: () {
-            // Điều hướng đến ProductDetailPage khi nhấn vào Container
             Navigator.push(
               context,
               MaterialPageRoute(

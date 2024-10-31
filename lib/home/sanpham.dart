@@ -7,6 +7,7 @@ import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/screen/manhinhchung.dart';
 
 import '../models/sanphamcart.dart';
+import '../screen/ggg.dart';
 import '../screen/tranggiohang.dart';
 
 class detailsanpham extends StatefulWidget {
@@ -45,6 +46,12 @@ class _detailsanphamState extends State<detailsanpham> {
       MaterialPageRoute(
         builder: (context) => CartPage(),
       ),
+    ).then(
+      (value) {
+        setState(() {
+          cart.getTotalQuantity();
+        });
+      },
     );
   }
 

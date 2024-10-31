@@ -55,12 +55,12 @@ class _ScreennState extends State<Screenn> {
                 )),
             Container(
                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height/9*widget.list.length*2+90,
+              height: MediaQuery.of(context).size.height/8*widget.list.length*2+90,
               child: GridView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // Mỗi hàng có 2 container
-                  childAspectRatio: 2 / 2, // Tỉ lệ chiều rộng/chiều cao của mỗi container
+                  childAspectRatio: 2/3, // Tỉ lệ chiều rộng/chiều cao của mỗi container
                   crossAxisSpacing: 8, // Khoảng cách ngang giữa các container
                   mainAxisSpacing: 8, // Khoảng cách dọc giữa các container
                 ),
@@ -98,7 +98,7 @@ class _ScreennState extends State<Screenn> {
                         children: [
                           Container(
                              width: MediaQuery.of(context).size.width,
-                             height:MediaQuery.of(context).size.width/3,
+                             height:MediaQuery.of(context).size.width/2,
                             child: product['hinh_anh'] != ""
                                 ? Image(
                                     image: NetworkImage(

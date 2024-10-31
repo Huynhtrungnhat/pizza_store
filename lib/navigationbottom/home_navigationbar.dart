@@ -1,15 +1,20 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:pizza_store/login/regisiter.dart';
+import 'package:pizza_store/models/layidnguoidung.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
-
 import 'package:pizza_store/navigationbottom/donhang_page.dart';
 import 'package:pizza_store/home/home_page.dart';
 import 'package:pizza_store/navigationbottom/profile_page.dart';
 import 'package:pizza_store/navigationbottom/shopcash.dart';
+import 'package:pizza_store/screen/Trangcanhan.dart';
 import 'package:pizza_store/screen/addsanpham.dart';
+import 'package:pizza_store/screen/ggg.dart';
+import 'package:pizza_store/screen/themkhuyenmai.dart';
 import 'package:pizza_store/screen/tranggiohang.dart';
-
 import '../home/sanpham.dart';
+import '../login/login.dart';
+ // Đảm bảo import AuthService
 
 class CurveBar extends StatefulWidget {
   const CurveBar({super.key});
@@ -20,12 +25,18 @@ class CurveBar extends StatefulWidget {
 
 class _CurveBarState extends State<CurveBar> {
   int index = 0;
-  final screen = [
-    detailsanpham(),
-    AddProductPage(),
-    shophistory(),
-    CartPage(),
-  ];
+  String? userId; // Khai báo biến userId
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserId(); // Gọi phương thức để lấy userId khi khởi tạo
+  }
+
+  Future<void> _loadUserId() async {
+    userId = await AuthService.getUserId(); // Lấy userId từ AuthService
+    setState(() {}); // Cập nhật trạng thái để widget rebuild
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,35 +46,33 @@ class _CurveBarState extends State<CurveBar> {
       const Icon(Icons.person, size: 30),
       const Icon(Icons.shopping_cart_rounded, size: 30),
     ];
+
+    // Danh sách screen được xác định ở đây
+    final screen = [
+      detailsanpham(),
+      userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')), // Cung cấp thông báo nếu userId là null
+      LoginPage(),
+      CartPage(),
+    ];
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 200, 233, 239),
       extendBody: true,
-      body: screen[index],
-      // Center(
-      //   child: Text(
-      //     '$index',
-      //     style: const TextStyle(
-      //         fontSize: 110, fontWeight: FontWeight.bold, color: Colors.white),
-      //   ),
-      // ),
+      body: screen[index], // Chọn trang theo index
       bottomNavigationBar: Theme(
-        // this them is for to change icon colors.
         data: Theme.of(context).copyWith(
-            iconTheme: const IconThemeData(
-          color: Colors.white,
-        )),
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+        ),
         child: CurvedNavigationBar(
-          // navigationBar colors
           color: Color.fromARGB(255, 16, 127, 144),
-          //selected times colors
           buttonBackgroundColor: Color.fromARGB(255, 55, 14, 6),
           backgroundColor: Colors.transparent,
           items: items,
           height: 60,
           index: index,
-          onTap: (index) => setState(
-            () => this.index = index,
-          ),
+          onTap: (index) => setState(() => this.index = index),
         ),
       ),
     );

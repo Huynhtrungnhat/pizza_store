@@ -4,6 +4,8 @@ import 'package:pizza_store/home/sanpham.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
 import 'package:pizza_store/models/sanphammodel.dart';
 
+import '../navigationbottom/home_navigationbar.dart';
+
 class ProductDetailPage extends StatefulWidget {
   final Map<String, dynamic> product;
 
@@ -15,7 +17,7 @@ class ProductDetailPage extends StatefulWidget {
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
   int quantity = 1;
-  var sdf=0;
+  var sdf = 0;
 
   void incrementQuantity() {
     int stock = widget.product['so_luong_ton_kho'] ?? 0;
@@ -46,28 +48,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       ten_san_pham: widget.product['ten_san_pham'],
       gia: double.tryParse(widget.product['gia']) ?? 0.0,
       so_luong_ton_kho: quantity,
-      hinh_anh: widget.product['hinh_anh'], mo_ta: '',
+      hinh_anh: widget.product['hinh_anh'],
+      mo_ta: '',
     );
 
     cart.addsanpham(product);
-     print('Tổng số lượng sản phẩm trong giỏ hàng: ');
-     setState(() {
-        sdf=cart.getTotalQuantity();
-     });
+    print('Tổng số lượng sản phẩm trong giỏ hàng: ');
+    setState(() {
+      sdf = cart.getTotalQuantity();
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Đã thêm ${cart.getTotalQuantity()}'),
         duration: Duration(seconds: 2),
       ),
-
     );
-   Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => detailsanpham()),
-              (Route<dynamic> route) => false, // Xóa tất cả các trang trước đó
-            );
+    
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => CurveBar()),
+      (Route<dynamic> route) => false, 
+    );
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +83,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
       appBar: AppBar(
         title: Text("Chi tiết sản phẩm"),
         centerTitle: true,
+        backgroundColor: Colors.orange, // Thay đổi màu nền cho AppBar
       ),
       body: SingleChildScrollView(
-        child: Padding(
+        child: Container(
+          color: Colors.grey[200], // Thay đổi màu nền cho body
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,11 +103,11 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               Center(
                 child: Text(
                   widget.product['ten_san_pham'],
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.black), // Màu chữ cho tên sản phẩm
                 ),
               ),
               SizedBox(height: 16),
-              Text('Giá: ${widget.product['gia']} VND'),
+              Text('Giá: ${widget.product['gia']} VND', style: TextStyle(color: Colors.green,fontSize: 20)), // Màu chữ cho giá
               SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -119,27 +127,38 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                 ],
               ),
               SizedBox(height: 16),
-Text(
-  'Mô tả :',
-  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-),
-SizedBox(height: 8),
-Container(
-  padding: EdgeInsets.all(12.0),
- 
-  child: Text(
-widget.product['mo_ta'] ?? 'Không có mô tả',
-    style: TextStyle(fontSize: 16, color: Colors.black87),
-    textAlign: TextAlign.justify,
-  ),
-),
-SizedBox(height: 16),
-
+              Text(
+                'Mô tả :',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Container(
+                padding: EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Màu nền cho mô tả sản phẩm
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  widget.product['mo_ta'] ?? 'Không có mô tả',
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  textAlign: TextAlign.justify,
+                ),
+              ),
               SizedBox(height: 16),
               Center(
                 child: ElevatedButton(
                   onPressed: addToCart,
                   child: Text('Thêm vào giỏ hàng'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange, // Màu nền cho nút thêm vào giỏ hàng
+                  ),
                 ),
               ),
             ],

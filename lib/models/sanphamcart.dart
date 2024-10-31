@@ -36,6 +36,14 @@ class Cart {
     }
     return total;
   }
+  double getTotalPricekm() {
+    double total = 0;
+    for (var item in items) {
+      total += item.gia * item.so_luong_ton_kho;
+    }
+    return total;
+  }
+
 
   int getTotalQuantity() {
   Set<String> processedProductNames = {};
@@ -51,7 +59,6 @@ class Cart {
   }
   return totalQuantity;
 }
-
 }
 
 // Tạo một instance của Cart

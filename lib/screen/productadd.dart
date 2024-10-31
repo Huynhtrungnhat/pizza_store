@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/modeladdsanpham.dart';
@@ -6,7 +7,7 @@ import 'package:pizza_store/models/sanphammodel.dart';
 import 'package:http/http.dart' as http;
 class Myaddproduct{
 
-  Future<addproduct?> Addproducrtdata (String tenSanPham,String moTa,String gia,String soLuongTonKho)async{
+  Future<addproduct?> Addproducrtdata (String tenSanPham,String moTa,String gia,String soLuongTonKho, File? selectedImage, String? imageBase64)async{
     var url=Uri.parse(AppConstants.ALL_PRODUCT_URI);
     var response = await http.post(url,body: {
     "ten_san_pham":tenSanPham ,
