@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/home/sanpham.dart';
-import 'package:pizza_store/models/sanphamcart.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
 
 class ThanhToanThanhCong extends StatefulWidget {
@@ -21,22 +20,18 @@ void _quayveTrangChu() {
   );
 }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+
           children: [
 
-            SizedBox(height: 100.0,),
-
-            Icon(
-              Icons.verified_outlined,
-              color: Colors.green,
-              size: 100.0,
+            Lottie.network(
+              'https://lottie.host/96ac8faa-0762-431d-9037-69c6b7c20e4a/xsX7tCGShJ.json', 
+              width: 200.0, 
+              height: 200.0
             ),
 
             SizedBox(height: 30.0,),
