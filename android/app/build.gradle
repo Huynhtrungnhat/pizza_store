@@ -15,7 +15,7 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty("flutter.versionCode")
 if (flutterVersionCode == null) {
-    flutterVersionCode = "1"
+    flutterVersionCode = "1.0"
 }
 
 def flutterVersionName = localProperties.getProperty("flutter.versionName")
@@ -38,8 +38,10 @@ android {
         applicationId = "com.example.pizza_store"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        // minSdk = flutter.minSdkVersion
+        // targetSdk = flutter.targetSdkVersion
+        minSdk = 28
+        targetSdk = 28
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }

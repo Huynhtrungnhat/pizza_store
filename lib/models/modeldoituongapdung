@@ -1,0 +1,21 @@
+class DoiTuongApDung {
+  String? cOMBO;
+  String? sANPHAM;
+  String? hOADON;
+
+  DoiTuongApDung({this.cOMBO, this.sANPHAM, this.hOADON});
+
+  DoiTuongApDung.fromJson(Map<String, dynamic> json) {
+    cOMBO = json['COMBO'];
+    sANPHAM = json['SANPHAM'];
+    hOADON = json['HOADON'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['COMBO'] = this.cOMBO;
+    data['SANPHAM'] = this.sANPHAM;
+    data['HOADON'] = this.hOADON;
+    return data;
+  }
+}
