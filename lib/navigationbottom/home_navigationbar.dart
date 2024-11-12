@@ -49,7 +49,6 @@ class _CurveBarState extends State<CurveBar> {
 
     final screen = [
       detailsanpham(),
-      
       userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')), // Cung cấp thông báo nếu userId là null
       ProductInputPage(),
      Screnlisad(),

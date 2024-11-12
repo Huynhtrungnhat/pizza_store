@@ -20,9 +20,6 @@ void _quayveTrangChu() {
     (route) => false, 
   );
 }
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

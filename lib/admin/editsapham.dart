@@ -206,6 +206,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     base64Image ?? '',
                   );
                 },
+                
                 child: Text('Lưu'),
               ),
             ],

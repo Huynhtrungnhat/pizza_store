@@ -56,7 +56,8 @@ class _detailsanphamState extends State<detailsanpham> {
     @override
   void initState() {
     super.initState();
-    cart.loadCartFromSharedPreferences(); // Tải giỏ hàng từ SharedPreferences khi bắt đầu
+    cart.loadCartFromSharedPreferences(); 
+    
   }
 
   @override

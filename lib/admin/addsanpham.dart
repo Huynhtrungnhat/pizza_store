@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
 
 class ProductInputPage extends StatefulWidget {
   @override
@@ -20,7 +21,8 @@ class _ProductInputPageState extends State<ProductInputPage> {
   final TextEditingController _promotionValueController =TextEditingController();
 
   File? _selectedImage;
-  String? _selectedPromotionType;
+  String? Chonkhuyenmai;
+  String? _chonMALoai;
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -38,7 +40,7 @@ class _ProductInputPageState extends State<ProductInputPage> {
     return base64Encode(imageBytes);
   }
 
-  Future<void> ThemSanPham( String ten_san_pham,String mota,int gia,int so_luong_ton_kho,int ma_loai_san_pham,int ma_loai,String loai_khuyen_mai,int gia_tri_khuyen_mai,String Hinhanh) async {
+  Future<void> ThemSanPham( String ten_san_pham,String mota,int gia,int so_luong_ton_kho,int ma_loai_san_pham,String ma_loai,String loai_khuyen_mai,int gia_tri_khuyen_mai,String Hinhanh) async {
     final url = Uri.parse('${AppConstants.ALL_PRODUCT_URI}');
     try {
       final response = await http.post(
@@ -71,7 +73,6 @@ class _ProductInputPageState extends State<ProductInputPage> {
       print('Lỗi khi thực hiện yêu cầu: $error');
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,14 +144,47 @@ class _ProductInputPageState extends State<ProductInputPage> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
+              ),SizedBox(height: 10),
+              // DropdownMenu cho loại khuyến mãi
+              DropdownButtonFormField<String>(
+                value: _chonMALoai,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _chonMALoai = newValue;
+                  });
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: '1',
+                    child: Text('Pizza'),
+                  ),
+                  DropdownMenuItem(
+                    value: '2',
+                    child: Text('Gà '),
+                  ),
+                  DropdownMenuItem(
+                    value: '3',
+                    child: Text('Mỳ Ý '),
+                  ),
+                  DropdownMenuItem(
+                    value: '4',
+                    child: Text('Thức uống '),
+                  ),
+                ],
+                decoration: InputDecoration(
+                  labelText: 'Loại sản Phẩm',
+                  border: OutlineInputBorder(),
+                ),
               ),
+              SizedBox(height: 10),
+              
               SizedBox(height: 10),
               // DropdownMenu cho loại khuyến mãi
               DropdownButtonFormField<String>(
-                value: _selectedPromotionType,
+                value: Chonkhuyenmai,
                 onChanged: (String? newValue) {
                   setState(() {
-                    _selectedPromotionType = newValue;
+                    Chonkhuyenmai = newValue;
                   });
                 },
                 items: [
@@ -185,15 +219,24 @@ class _ProductInputPageState extends State<ProductInputPage> {
                   final price = int.parse(_priceController.text);
                   final stockQuantity = int.parse(_stockQuantityController.text);
                   final categoryId = int.parse(_categoryIdController.text);
-                  final promotionType = _selectedPromotionType ?? '';
+                  final promotionType = Chonkhuyenmai ?? '';
+                  final Maloai = _chonMALoai ?? '';
                   final promotionValue = int.parse(_promotionValueController.text);
                   String? base64Image = '';
                   if (_selectedImage != null) {
                     base64Image = 'data:image/jpeg;base64,' + await _convertImageToBase64(_selectedImage!);
                   }
 
-                  ThemSanPham(productName,description, price,stockQuantity, categoryId,1,promotionType,
+                  ThemSanPham(productName,description, price,stockQuantity, categoryId,Maloai,promotionType,
  promotionValue, base64Image);
+ Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (context) => CurveBar(),
+    ),
+    (route) => false, 
+  );
+
                   // print('Tên sản phẩm: $productName');
                   // print('Mô tả: $description');
                   // print('Giá: $price');

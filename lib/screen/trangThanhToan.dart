@@ -181,7 +181,7 @@ class _TrangThanhToanState extends State<TrangThanhToan> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TrangThanhToan(),
+                builder: (context) => ThanhToanThanhCong(),
               ),
             );
           },

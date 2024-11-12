@@ -36,10 +36,10 @@ class _ScreennState extends State<Screenn> {
       } else {
         filteredList = widget.list.where((product) {
           // In ra giá trị của ma_loai_san_pham để kiểm tra
-          log('Product category: ${product['ma_loai_san_pham']}');
+          log('Product category: ${product['ma_loai']}');
 
           // So sánh chuỗi với chuỗi, hoặc số với số
-          return product['ma_loai_san_pham'].toString() == category;
+          return product['ma_loai'].toString() == category;
         }).toList();
       }
     });
@@ -53,30 +53,30 @@ class _ScreennState extends State<Screenn> {
         child: Column(
           children: [
             // Carousel Slider
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height / 2.5,
-              child: CarouselSlider(
-                items: filteredList.map((product) {
-                  return Image(
-                    image: NetworkImage(
-                        "${AppConstants.BASE_URL}${product['hinh_anh']}"),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                  );
-                }).toList(),
-                options: CarouselOptions(
-                  height: MediaQuery.of(context).size.height / 2.5,
-                  enlargeCenterPage: true,
-                  autoPlay: true,
-                  aspectRatio: 16 / 9,
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: true,
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  viewportFraction: 1,
-                ),
-              ),
-            ),
+            // Container(
+            //   width: double.infinity,
+            //   height: MediaQuery.of(context).size.height / 2.5,
+            //   child: CarouselSlider(
+            //     items: filteredList.map((product) {
+            //       return Image(
+            //         image: NetworkImage(
+            //             "${AppConstants.BASE_URL}${product['hinh_anh']}"),
+            //         fit: BoxFit.cover,
+            //         width: double.infinity,
+            //       );
+            //     }).toList(),
+            //     options: CarouselOptions(
+            //       height: MediaQuery.of(context).size.height / 2.5,
+            //       enlargeCenterPage: true,
+            //       autoPlay: true,
+            //       aspectRatio: 16 / 9,
+            //       autoPlayCurve: Curves.fastOutSlowIn,
+            //       enableInfiniteScroll: true,
+            //       autoPlayAnimationDuration: const Duration(milliseconds: 800),
+            //       viewportFraction: 1,
+            //     ),
+            //   ),
+            // ),
 
             // Buttons to filter products
          Container(
@@ -86,28 +86,28 @@ class _ScreennState extends State<Screenn> {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        ElevatedButton(
-          onPressed: () => filterProducts('Tất cả'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.all_inclusive,
-                color: selectedCategory == 'Tất cả' ? Colors.white : Colors.black, // Màu icon
-              ),
-              SizedBox(width: 8), // Khoảng cách giữa icon và chữ
-              Text(
-                'Tất cả',
-                style: TextStyle(
-                  color: selectedCategory == 'Tất cả' ? Colors.white : Colors.white, // Màu chữ
-                ),
-              ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedCategory == 'Tất cả' ? Colors.amber[400] : Colors.grey, // Màu nền nút
-          ),
-        ),
+        // ElevatedButton(
+        //   onPressed: () => filterProducts('Tất cả'),
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Icon(
+        //         Icons.all_inclusive,
+        //         color: selectedCategory == 'Tất cả' ? Colors.white : Colors.black, // Màu icon
+        //       ),
+        //       SizedBox(width: 8), // Khoảng cách giữa icon và chữ
+        //       Text(
+        //         'Tất cả',
+        //         style: TextStyle(
+        //           color: selectedCategory == 'Tất cả' ? Colors.white : Colors.white, // Màu chữ
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        //   style: ElevatedButton.styleFrom(
+        //     backgroundColor: selectedCategory == 'Tất cả' ? Colors.amber[400] : Colors.grey, // Màu nền nút
+        //   ),
+        // ),
          SizedBox(width: 12), 
         ElevatedButton(
           onPressed: () => filterProducts('1'),
@@ -115,12 +115,12 @@ class _ScreennState extends State<Screenn> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FaIcon(
-                FontAwesomeIcons.drumstickBite,
+                FontAwesomeIcons.pizzaSlice,
                 color: selectedCategory == '1' ? Colors.orange : Colors.black, // Màu icon
               ),
               SizedBox(width: 8),
               Text(
-                'Gà',
+                'pizza',
                 style: TextStyle(
                   color: selectedCategory == '1' ? Colors.white : Colors.white, // Màu chữ
                 ),
@@ -138,12 +138,12 @@ class _ScreennState extends State<Screenn> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FaIcon(
-                FontAwesomeIcons.fish,
+                FontAwesomeIcons.drumstickBite,
                 color: selectedCategory == '2' ? Colors.blue : Colors.black, // Màu icon
               ),
               SizedBox(width: 8),
               Text(
-                'Hải sản',
+                'Gà',
                 style: TextStyle(
                   color: selectedCategory == '2' ? Colors.white : Colors.black, // Màu chữ
                 ),
@@ -161,12 +161,12 @@ class _ScreennState extends State<Screenn> {
             mainAxisSize: MainAxisSize.min,
             children: [
               FaIcon(
-                FontAwesomeIcons.cow,
+                FontAwesomeIcons.bowlRice,
                 color: selectedCategory == '3' ? Colors.white : Colors.black, // Màu icon
               ),
               SizedBox(width: 8),
               Text(
-                'Bò',
+                'Mỳ',
                 style: TextStyle(
                   color: selectedCategory == '3' ? Colors.white : Colors.white, // Màu chữ
                 ),
@@ -175,6 +175,29 @@ class _ScreennState extends State<Screenn> {
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: selectedCategory == '3' ? Colors.amber : Colors.grey, // Màu nền nút
+          ),
+        ),
+        SizedBox(width: 12), 
+        ElevatedButton(
+          onPressed: () => filterProducts('4'),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FaIcon(
+                FontAwesomeIcons.glassMartini,
+                color: selectedCategory == '4' ? Colors.white : Colors.black, // Màu icon
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Thức uống',
+                style: TextStyle(
+                  color: selectedCategory == '4' ? Colors.white : Colors.white, // Màu chữ
+                ),
+              ),
+            ],
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: selectedCategory == '4' ? Colors.amber : Colors.grey, // Màu nền nút
           ),
         ),
         // Bạn có thể thêm các nút khác nếu cần

@@ -20,7 +20,6 @@ class Screnlisad extends StatefulWidget {
 
 class _ScrenlisadState extends State<Screnlisad> {
   
-  
   Future<List> getData() async {
     log('${AppConstants.BASE_URL}/sanpham');
     final response = await http.get(
