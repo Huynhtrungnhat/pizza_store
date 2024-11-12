@@ -35,6 +35,8 @@ class addproduct {
     updatedAt = json['updated_at'];
   }
 
+  get statusCode => null;
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['ma_san_pham'] = this.maSanPham;

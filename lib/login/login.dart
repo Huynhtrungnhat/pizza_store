@@ -45,12 +45,11 @@ Future<void> login() async {
 
       if (response.statusCode == 202) {
         final responseData = jsonDecode(response.body);
-       final String userId = responseData['user']['id'].toString(); // Lấy ID người dùng
+       final String userId = responseData['user']['id'].toString(); 
 
-        // Lưu ID vào SharedPreferences
         await AuthService.saveUserId(userId);
+        await setLoginStatus(true);
 
-        // Chuyển hướng đến trang cá nhân với ID người dùng
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CurveBar()),
@@ -72,6 +71,10 @@ Future<void> login() async {
   }
 }
 
+Future<void> setLoginStatus(bool isLoggedIn) async {
+    final prefs = await SharedPreferences.getInstance();
+     await prefs.setBool('isLoggedIn', isLoggedIn); // Lưu trạng thái đăng nhập
+ }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +144,7 @@ Future<void> login() async {
                 ),
                 SizedBox(height: 12),
                 GestureDetector(
-                  onTap: _isLoading ? null : login, 
+                  onTap: _isLoading ? null : login ,
                   child: Container(
                     width: double.infinity,
                     height: 35,

@@ -3,21 +3,22 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/admin/listproductad.dart';
 
 import 'package:pizza_store/screen/manhinhchung.dart';
 
 import '../models/sanphamcart.dart';
-import '../admin/adminlistscren.dart';
+import 'adminlistscren.dart';
 import '../screen/tranggiohang.dart';
 
-class detailsanpham extends StatefulWidget {
-  const detailsanpham({super.key});
+class Screnlisad extends StatefulWidget {
+  const Screnlisad({super.key});
 
   @override
-  State<detailsanpham> createState() => _detailsanphamState();
+  State<Screnlisad> createState() => _ScrenlisadState();
 }
 
-class _detailsanphamState extends State<detailsanpham> {
+class _ScrenlisadState extends State<Screnlisad> {
   
   
   Future<List> getData() async {
@@ -73,57 +74,10 @@ class _detailsanphamState extends State<detailsanpham> {
             return Center(child: Text('Lỗi: ${snapshot.error}'));
           }
           return snapshot.hasData
-              ? Screenn(list: snapshot.data!)
+              ? ListAd(list: snapshot.data!)
               : Center(child: CircularProgressIndicator());
         },
       ),
-      floatingActionButton: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          FloatingActionButton(
-            onPressed: _incrementCounter,
-            tooltip: 'Giỏ Hàng',
-            child: const Icon(Icons.shopping_cart_rounded),
-          ),
-          Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                shape: BoxShape.circle,
-              ),
-              child: Text(
-              '${cart.getTotalQuantity()}', 
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: CustomFloatingActionButtonLocation(
-        FloatingActionButtonLocation.endFloat,
-        -20.0,
-        -80.0,
-      ),
     );
-  }
 }
-
-class CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
-  final FloatingActionButtonLocation location;
-  final double offsetX;
-  final double offsetY;
-
-  CustomFloatingActionButtonLocation(this.location, this.offsetX, this.offsetY);
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final Offset originalOffset = location.getOffset(scaffoldGeometry);
-    return Offset(originalOffset.dx + offsetX, originalOffset.dy + offsetY);
-  }
 }

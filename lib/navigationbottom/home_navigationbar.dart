@@ -8,8 +8,8 @@ import 'package:pizza_store/home/home_page.dart';
 import 'package:pizza_store/navigationbottom/profile_page.dart';
 import 'package:pizza_store/navigationbottom/shopcash.dart';
 import 'package:pizza_store/screen/Trangcanhan.dart';
-import 'package:pizza_store/screen/addsanpham.dart';
-import 'package:pizza_store/screen/ggg.dart';
+import 'package:pizza_store/admin/addsanpham.dart';
+import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/screen/themkhuyenmai.dart';
 import 'package:pizza_store/screen/tranggiohang.dart';
 import '../home/sanpham.dart';
@@ -30,12 +30,12 @@ class _CurveBarState extends State<CurveBar> {
   @override
   void initState() {
     super.initState();
-    _loadUserId(); // Gọi phương thức để lấy userId khi khởi tạo
+    _loadUserId(); 
   }
 
   Future<void> _loadUserId() async {
-    userId = await AuthService.getUserId(); // Lấy userId từ AuthService
-    setState(() {}); // Cập nhật trạng thái để widget rebuild
+    userId = await AuthService.getUserId(); 
+    setState(() {}); 
   }
 
   @override
@@ -47,12 +47,13 @@ class _CurveBarState extends State<CurveBar> {
       const Icon(Icons.shopping_cart_rounded, size: 30),
     ];
 
-    // Danh sách screen được xác định ở đây
     final screen = [
       detailsanpham(),
+      
       userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')), // Cung cấp thông báo nếu userId là null
-      LoginPage(),
-      CartPage(),
+      ProductInputPage(),
+     Screnlisad(),
+     
     ];
 
     return Scaffold(
