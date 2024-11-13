@@ -21,7 +21,7 @@ class _ListAdState extends State<ListAd> {
   @override
   void initState() {
     super.initState();
-    filteredList = widget.list; // Khởi tạo danh sách ban đầu
+    filteredList = widget.list; 
   }
 
   void filterSearchResults(String query) {
@@ -202,10 +202,9 @@ class _ListAdState extends State<ListAd> {
                                               EditProductPage(product: product),
                                         ),
                                       ).then((updatedProduct) {
-                                        // Cập nhật lại sản phẩm trong danh sách khi quay lại
+                             
                                         if (updatedProduct != null) {
                                           setState(() {
-                                            // Cập nhật thông tin sản phẩm sau khi chỉnh sửa
                                             filteredList[index] = updatedProduct;
                                           });
                                         }

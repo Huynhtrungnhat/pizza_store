@@ -142,14 +142,16 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               children: [
                 Text('Giá: ', style: TextStyle(color: Colors.red, fontSize: 20)),
                 Text('$displayPrice VND', style: TextStyle(color: Colors.red, fontSize: 20)),
-                if (discountInfo.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: Text(
-                  discountInfo,
-                  style: TextStyle(color: Colors.red, fontSize: 16, fontStyle: FontStyle.italic),
+                if (discountInfo.isNotEmpty && displayPrice != formattedPrice) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Text(
+                    discountInfo,
+                    style: TextStyle(color: Colors.red, fontSize: 16, fontStyle: FontStyle.italic),
+                  ),
                 ),
-              ),
+              ],
+
               ],
             ),
             SizedBox(height: 8),

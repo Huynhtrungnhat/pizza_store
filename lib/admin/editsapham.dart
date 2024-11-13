@@ -48,6 +48,21 @@ class _EditProductPageState extends State<EditProductPage> {
       return null;
     }
   }
+  Future<String> _convertUrlToBase64(String imageUrl) async {
+  try {
+    final response = await http.get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      // Chuyển đổi dữ liệu hình ảnh thành base64
+      return 'data:image/jpeg;base64,' + base64Encode(response.bodyBytes);
+    } else {
+      throw Exception('Không thể tải ảnh');
+    }
+  } catch (e) {
+    print('Lỗi khi chuyển đổi URL thành base64: $e');
+    return '';
+  }
+}
+
 
   // Pick image from gallery
   Future<void> _pickImage() async {
@@ -57,7 +72,7 @@ class _EditProductPageState extends State<EditProductPage> {
     });
   }
   Future<void> updateProduct(String ten_san_pham, String mota, int gia, int so_luong_ton_kho,
-      int ma_loai_san_pham, int ma_loai, String loai_khuyen_mai, int gia_tri_khuyen_mai, String Hinhanh) async {
+      int ma_loai_san_pham, String ma_loai, String loai_khuyen_mai, int gia_tri_khuyen_mai, String Hinhanh) async {
     final url = Uri.parse('${AppConstants.ALL_PRODUCT_URI}/${widget.product['ma_san_pham']}'); 
     print(widget.product['ma_san_pham']);
     try {
@@ -149,7 +164,6 @@ class _EditProductPageState extends State<EditProductPage> {
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(labelText: 'Số lượng tồn kho'),
               ),
-
               DropdownButton<String>(
                 value: _selectedPromotionType,
                 onChanged: (newValue) {
@@ -180,16 +194,18 @@ class _EditProductPageState extends State<EditProductPage> {
                
                   String? base64Image = '';
                   if (_image != null) {
-                    base64Image = 'data:image/jpeg;base64,${await _convertImageToBase64(_image!)}';
-                  } else {
-                    base64Image = imageUrlController.text.isNotEmpty ? imageUrlController.text : '';
-                  }
+                      // Nếu chọn ảnh mới, chuyển đổi nó thành base64
+                      base64Image = 'data:image/jpeg;base64,${await _convertImageToBase64(_image!)}';
+                    } else if (imageUrlController.text.isNotEmpty) {
+                      // Nếu không chọn ảnh mới, lấy URL ảnh cũ và chuyển đổi nó thành base64
+                      base64Image = await _convertUrlToBase64(imageUrlController.text);
+                    }
                   String tenSanPham = nameController.text;
                   String moTa = descriptionController.text;
                   int gia = int.tryParse(priceController.text) ?? 0;
                   int soLuongTonKho = int.tryParse(stockController.text) ?? 0;
                   int maLoaiSanPham = widget.product['ma_loai_san_pham'] ?? 0;
-                  int maLoai = widget.product['ma_loai'] ?? 0; 
+                  String maLoai = widget.product['ma_loai'] ?? 0; 
                   String loaiKhuyenMai = _selectedPromotionType ?? '';
                   int giaTriKhuyenMai = int.tryParse(promotionValueController.text) ?? 0;
 

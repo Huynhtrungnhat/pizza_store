@@ -15,7 +15,7 @@ class Screenn extends StatefulWidget {
 }
 
 class _ScreennState extends State<Screenn> {
-  String selectedCategory = 'Tất cả';
+  String selectedCategory = '1';
   List filteredList = [];
 
   @override
@@ -31,7 +31,7 @@ class _ScreennState extends State<Screenn> {
       // In giá trị để kiểm tra (debugging)
       log('Selected category: $category');
 
-      if (category == 'Tất cả') {
+      if (category == '1') {
         filteredList = widget.list;
       } else {
         filteredList = widget.list.where((product) {
@@ -86,28 +86,6 @@ class _ScreennState extends State<Screenn> {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        // ElevatedButton(
-        //   onPressed: () => filterProducts('Tất cả'),
-        //   child: Row(
-        //     mainAxisSize: MainAxisSize.min,
-        //     children: [
-        //       Icon(
-        //         Icons.all_inclusive,
-        //         color: selectedCategory == 'Tất cả' ? Colors.white : Colors.black, // Màu icon
-        //       ),
-        //       SizedBox(width: 8), // Khoảng cách giữa icon và chữ
-        //       Text(
-        //         'Tất cả',
-        //         style: TextStyle(
-        //           color: selectedCategory == 'Tất cả' ? Colors.white : Colors.white, // Màu chữ
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        //   style: ElevatedButton.styleFrom(
-        //     backgroundColor: selectedCategory == 'Tất cả' ? Colors.amber[400] : Colors.grey, // Màu nền nút
-        //   ),
-        // ),
          SizedBox(width: 12), 
         ElevatedButton(
           onPressed: () => filterProducts('1'),
@@ -200,14 +178,12 @@ class _ScreennState extends State<Screenn> {
             backgroundColor: selectedCategory == '4' ? Colors.amber : Colors.grey, // Màu nền nút
           ),
         ),
-        // Bạn có thể thêm các nút khác nếu cần
+        
       ],
     ),
   ),
 ),
 
-
-            // Product Grid
             Container(
               padding: EdgeInsets.all(8),
               child: GridView.builder(
@@ -227,7 +203,7 @@ class _ScreennState extends State<Screenn> {
                   String saleLabel = "";
                   double discountPercentage = 0;
 
-                  // Kiểm tra và xử lý phần trăm giảm giá
+                 
                   if (product['loai_khuyen_mai'] == 'PHANTRAM' &&
                       product['gia_tri_khuyen_mai'] != null) {
                     double discount =
