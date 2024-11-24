@@ -64,7 +64,7 @@ class Cart {
   Future<void> loadCartFromSharedPreferences() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   List<String>? cartList = prefs.getStringList('cart');
-  print('Dữ liệu giỏ hàng từ SharedPreferences: $cartList'); 
+ // print('Dữ liệu giỏ hàng từ SharedPreferences: $cartList'); 
 
   if (cartList != null && cartList.isNotEmpty) {
     items = cartList.map((item) => Product.fromJson(json.decode(item))).toList();

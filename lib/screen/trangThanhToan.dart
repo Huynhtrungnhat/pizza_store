@@ -1,41 +1,39 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:pizza_store/models/sanphammodel.dart';
+import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/models/sanphamcart.dart';
 import 'package:pizza_store/screen/trangTTThanhCong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../api/controller.dart';
-import '../models/sanphamcart.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io' show Platform;
 
-class TrangThanhToan extends StatefulWidget {
-  const TrangThanhToan({super.key});
+class MobilePaymentScreen extends StatefulWidget {
+  final double amount;
+  final Function() onPaymentSuccess;
+  final Function() onPaymentFailure;
+  final Function() saveData;
+
+  const MobilePaymentScreen({
+    Key? key,
+    required this.amount,
+    required this.onPaymentSuccess,
+    required this.onPaymentFailure,
+    required this.saveData,
+  }) : super(key: key);
 
   @override
-  State<TrangThanhToan> createState() => _TrangThanhToanState();
+  _MobilePaymentScreenState createState() => _MobilePaymentScreenState();
 }
 
-class _TrangThanhToanState extends State<TrangThanhToan> {
-  Future<void> addHoaDon(
-      String tong_tien, int ma_khach_hang, int ma_nhan_vien) async {
-    final url = Uri.parse('${AppConstants.BASE_URL}/hoadon');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'tong_tien': tong_tien,
-        'ma_khach_hang': ma_khach_hang,
-        'ma_nhan_vien': ma_nhan_vien
-      }),
-    );
-  }
-
+class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
+  bool isLoading = true;
+  bool isPaymentComplete = false;
+  String currentUrl = '';
+  late final WebViewController _controller;
   Map<String, dynamic>? userData;
   String? errorMessage;
-  bool isLoading = true;
+ // bool isLoading = true;
   String? userId;
 
   Future<void> fetchUserData() async {
@@ -44,11 +42,11 @@ class _TrangThanhToanState extends State<TrangThanhToan> {
 
     if (userId != null) {
       final response =
-          await http.get(Uri.parse('${AppConstants.User_id}/$userId'));
+          await http.get(Uri.parse('${AppConstants.khachhang}/$userId'));
 
       if (response.statusCode == 201) {
         setState(() {
-          userData = json.decode(response.body)['user'];
+          userData = json.decode(response.body)['khachhang'];
           errorMessage = null;
         });
       } else {
@@ -76,178 +74,124 @@ class _TrangThanhToanState extends State<TrangThanhToan> {
     return totalPrice - discountAmount;
   }
 
-  TextEditingController mkmController = TextEditingController();
-  Widget dashedDivider({
-    double dashWidth = 5,
-    double dashHeight = 2,
-    List<Color> colors = const [Colors.grey, Colors.blue], // Màu xen kẽ
-    double indent = 20,
-    double endIndent = 20,
-    double spaceBetweenDashes = 3,
-  }) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: indent),
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          double dashCount =
-              (constraints.constrainWidth() - indent - endIndent) /
-                  (dashWidth + spaceBetweenDashes);
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(dashCount.floor(), (index) {
-              return Container(
-                width: dashWidth,
-                height: dashHeight,
-                color: colors[index % colors.length], // Xen kẽ màu
-              );
-            }),
-          );
-        },
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
-    fetchUserData();
+    _initializePayment();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (String url) {
+            setState(() {
+              isLoading = false;
+              currentUrl = url;
+            });
+            if (!isPaymentComplete && url.contains('vnpay_return')) {
+              _checkPaymentStatus(url);
+            }
+          },
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('tel:') ||
+                request.url.startsWith('mailto:') ||
+                request.url.startsWith('sms:')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final numberFormat = NumberFormat("#,##0.000", "vi_VN");
-    return Scaffold(
-      appBar: AppBar(
-        title:Column(
-          children: [
-            Text("Tổng quan đơn hàng",style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,),),
-            Row(
-               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-               Icon(FontAwesomeIcons.shieldHalved,color: Colors.green,size: 14,),SizedBox(width: 5),
-                   Text("Thông tin của bạn sẽ được bảo mật ",style: TextStyle(fontSize: 12,color: Colors.green, ),),
-              ],
-            )
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            dashedDivider(
-              colors: [Colors.red, Colors.green], 
-              dashWidth: 10,
-              dashHeight: 3,
-              indent: 1,
-              endIndent: 1,
-              spaceBetweenDashes: 7,
-            ),
-            Row(
-              children: [
-                Icon(Icons.add_location_alt_outlined),
-                SizedBox(width: 10),
-                Text(
-                  'Địa chỉ nhận hàng',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red),
-                  textAlign: TextAlign.left,
-                ),
-                SizedBox(width: 200),
-                Icon(Icons.edit),
-              ],
-            ),
-            SizedBox(height: 2),
-            Text(
-              'Tên người nhận: ${userData?['name'] ?? 'N/A'}',
-            ),
-            Text(
-              'Sđt: ${userData?['name'] ?? 'N/A'}',
-            ),
-            Text(
-              'Địa Chỉ: ${userData?['diachi'] ?? 'N/A'} ',
-            ),
-            dashedDivider(
-              colors: [Colors.red, Colors.green], // Màu sắc xen kẽ
-              dashWidth: 10,
-              dashHeight: 3,
-              indent: 1,
-              endIndent: 1,
-              spaceBetweenDashes: 7,
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: cart.items.length,
-                itemBuilder: (context, index) {
-                  var item = cart.items[index];
-                  return SingleChildScrollView(
-                      child: ListTile(
-                    title: Text(
-                      item.ten_san_pham,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      'VND ${numberFormat.format(item.gia)}',
-                    ),
-                    leading: Image.network(
-                      '${AppConstants.BASE_URL}${item.hinh_anh}',
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(' X ${item.so_luong_ton_kho}'),
-                      ],
-                    ),
-                  ));
-                },
-              ),
-            ),
-            Text(
-              'Mã khuyến mãi',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 5),
-            Container(
-              width: 350,
-              child: TextFormField(
-                controller: mkmController,
-                decoration: InputDecoration(
-                  labelText: 'Nhập mã khuyến mãi',
-                  border: OutlineInputBorder(),
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                ),
-              ),
-            ),
-            SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text('Áp dụng mã'),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 45,
-              child: ElevatedButton(
-                onPressed: () {
-                  final tongTien = getTotalAfterDiscount().toStringAsFixed(2);
-                  final maKh = userData?['id'];
-                  final maNV = userData?['id'];
-                  addHoaDon(tongTien, maKh!, maNV!);
+  Future<void> _initializePayment() async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://172.20.10.9:8000/api/vnpay_payment'), // Cập nhật URL chính xác
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'amount': widget.amount,
+          'bank_code': 'VNBANK',
+          'language': 'vn',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['code'] == '00') {
+          String paymentUrl = responseData['data'];
+          if (paymentUrl.isNotEmpty) {
+            _controller.loadRequest(Uri.parse(paymentUrl));
+          } else {
+            _showError('Received an empty payment URL.');
+          }
+        } else {
+          _showError('Payment initialization failed: ${responseData['message']}');
+        }
+      } else {
+        _showError('Server error: ${response.statusCode}');
+      }
+    } catch (e) {
+      _showError('Network error: Unable to initialize payment. $e');
+    }
+  }
+
+  void _checkPaymentStatus(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final responseCode = uri.queryParameters['vnp_ResponseCode'];
+      final transactionStatus = uri.queryParameters['vnp_TransactionStatus'];
+
+      if ((responseCode == '00' || transactionStatus == '00') && !isPaymentComplete) {
+        setState(() => isPaymentComplete = true);
+        _handlePaymentSuccess();
+      } else if (responseCode != null || transactionStatus != null) {
+        _handlePaymentFailure(responseCode ?? transactionStatus ?? 'unknown');
+      }
+    } catch (e) {
+      _showError('Error parsing payment response: $e');
+    }
+  }
+
+  void _handlePaymentSuccess() {
+    widget.saveData();
+    if (mounted) {
+      widget.onPaymentSuccess();
+      _showSuccessDialog();
+    }
+  }
+
+  void _handlePaymentFailure(String errorCode) {
+    if (mounted) {
+      widget.onPaymentFailure();
+      _showFailureDialog(errorCode);
+    }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green),
+              SizedBox(width: 8),
+              Text('Thành Công'),
+            ],
+          ),
+          content: Text('Bạn đã thanh toán thành công'),
+          actions: [
+            TextButton(
+              child: Text('đóng'),
+              onPressed: () {
+                // final tongTien = getTotalAfterDiscount().toStringAsFixed(2);
+                //   final maKh = userData?['ma_khach_hang'];
+                //   addHoaDon(tongTien, maKh!);
                   cart.clear();
                   Navigator.pop(context);
                   Navigator.push(
@@ -256,22 +200,112 @@ class _TrangThanhToanState extends State<TrangThanhToan> {
                       builder: (context) => ThanhToanThanhCong(),
                     ),
                   );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  'Thanh Toán ${numberFormat.format(cart.getTotalPrice())}',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
+                // Navigator.of(context).pop(); // Close dialog
+                // Navigator.of(context).pop(); // Return to previous screen
+              },
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showFailureDialog(String errorCode) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Payment Failed'),
+          ],
+        ),
+        content: Text(_getErrorMessage(errorCode)),
+        actions: [
+          TextButton(
+            child: Text('Try Again'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog
+              _initializePayment(); // Restart payment process
+            },
+          ),
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(context).pop(); // Return to previous screen
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+        action: SnackBarAction(
+          label: 'Retry',
+          textColor: Colors.white,
+          onPressed: _initializePayment,
+        ),
+      ),
+    );
+  }
+   Future<void> addHoaDon(String tong_tien, int ma_khach_hang) async {
+    final url = Uri.parse('${AppConstants.BASE_URL}/hoadon');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'tong_tien': tong_tien,
+        'ma_khach_hang': ma_khach_hang,
+      }),
+    );
+  }
+
+  String _getErrorMessage(String errorCode) {
+    switch (errorCode) {
+      case '24':
+        return 'Payment was cancelled.';
+      default:
+        return 'Payment process could not be completed (Error: $errorCode). Please try again.';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Payment'),
+        leading: IconButton(
+          icon: Icon(Platform.isIOS ? Icons.arrow_back_ios : Icons.arrow_back),
+          onPressed: () {
+            if (!isPaymentComplete) {
+              widget.onPaymentFailure();
+            }
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (isLoading)
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }

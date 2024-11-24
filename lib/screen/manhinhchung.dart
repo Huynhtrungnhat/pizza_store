@@ -1,48 +1,121 @@
 import 'dart:developer';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/screen/chitietsanpham.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class Screenn extends StatefulWidget {
-  final List list;
+  final List list; 
   const Screenn({super.key, required this.list});
 
   @override
   State<Screenn> createState() => _ScreennState();
 }
-
 class _ScreennState extends State<Screenn> {
-  String selectedCategory = '1';
+  String selectedCategory = '0';
   List filteredList = [];
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _searchText = '';
+  final TextEditingController _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    filteredList = widget.list; // Khởi tạo danh sách ban đầu
+    _speech = stt.SpeechToText();
+    filteredList = widget.list;
   }
 
   void filterProducts(String category) {
     setState(() {
       selectedCategory = category;
-
-      // In giá trị để kiểm tra (debugging)
-      log('Selected category: $category');
-
-      if (category == '1') {
+      if (category == '0') {
         filteredList = widget.list;
       } else {
         filteredList = widget.list.where((product) {
-          // In ra giá trị của ma_loai_san_pham để kiểm tra
-          log('Product category: ${product['ma_loai']}');
-
-          // So sánh chuỗi với chuỗi, hoặc số với số
           return product['ma_loai'].toString() == category;
         }).toList();
       }
     });
+  }
+
+  void searchProducts(String query) {
+    setState(() {
+      _searchText = query;
+      filteredList = widget.list.where((product) {
+        return product['ten_san_pham']
+            .toString()
+            .toLowerCase()
+            .contains(query.toLowerCase());
+      }).toList();
+    });
+  }
+
+void _startListening() async {
+  bool available = await _speech.initialize(
+    onStatus: (status) => log('Status: $status'),
+    onError: (error) => log('Error: $error'),
+  );
+
+  if (available) {
+   
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Không cho đóng dialog khi nhấn ra ngoài
+      builder: (context) => AlertDialog(
+       title: Row(
+            children: [
+              Icon(
+                _isListening ? Icons.mic : Icons.mic_none,
+                color: _isListening ? Colors.red : Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              const Text('Vui lòng nói...'),
+            ],
+          ),
+          content: const Text(
+              'Hãy nói từ khóa sản phẩm bạn muốn tìm kiếm vào mic.'),
+        actions: [],
+      ),
+    );
+
+    setState(() => _isListening = true);
+    
+    Future.delayed(const Duration(seconds: 3), () {
+      if (Navigator.canPop(context)) {
+
+        Navigator.of(context).pop();
+        _stopListening(); // Đóng dialog sau 3 giây
+      }
+    });
+    
+
+    // Bắt đầu lắng nghe giọng nói
+    _speech.listen(
+      onResult: (result) {
+        setState(() {
+          _searchText = result.recognizedWords;
+          _textController.text = _searchText;
+          searchProducts(_searchText);
+          
+        });
+         
+        if (result.recognizedWords.isNotEmpty) {
+          if (Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+             _stopListening(); // Đóng dialog ngay lập tức
+          }
+        }
+      },
+    );
+  }
+}
+
+  void _stopListening() {
+    setState(() => _isListening = false);
+    _speech.stop();
   }
 
   @override
@@ -52,144 +125,60 @@ class _ScreennState extends State<Screenn> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Carousel Slider
-            // Container(
-            //   width: double.infinity,
-            //   height: MediaQuery.of(context).size.height / 2.5,
-            //   child: CarouselSlider(
-            //     items: filteredList.map((product) {
-            //       return Image(
-            //         image: NetworkImage(
-            //             "${AppConstants.BASE_URL}${product['hinh_anh']}"),
-            //         fit: BoxFit.cover,
-            //         width: double.infinity,
-            //       );
-            //     }).toList(),
-            //     options: CarouselOptions(
-            //       height: MediaQuery.of(context).size.height / 2.5,
-            //       enlargeCenterPage: true,
-            //       autoPlay: true,
-            //       aspectRatio: 16 / 9,
-            //       autoPlayCurve: Curves.fastOutSlowIn,
-            //       enableInfiniteScroll: true,
-            //       autoPlayAnimationDuration: const Duration(milliseconds: 800),
-            //       viewportFraction: 1,
-            //     ),
-            //   ),
-            // ),
-
-            // Buttons to filter products
-         Container(
-  padding: EdgeInsets.symmetric(vertical: 8),
-  child: SingleChildScrollView(
-    scrollDirection: Axis.horizontal,  // Cho phép cuộn ngang
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-         SizedBox(width: 12), 
-        ElevatedButton(
-          onPressed: () => filterProducts('1'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FaIcon(
-                FontAwesomeIcons.pizzaSlice,
-                color: selectedCategory == '1' ? Colors.orange : Colors.black, // Màu icon
+            Container(
+              margin: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.2),
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Text(
-                'pizza',
-                style: TextStyle(
-                  color: selectedCategory == '1' ? Colors.white : Colors.white, // Màu chữ
-                ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _textController, // Kết nối với TextController
+                      onChanged: (value) => searchProducts(value),
+                      decoration: const InputDecoration(
+                        hintText: "Nhập tên sản phẩm...",
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(_isListening ? Icons.mic : Icons.mic_none),
+                    onPressed: _isListening ? _stopListening : _startListening,
+                  ),
+                ],
               ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedCategory == '1' ? Colors.amber[400] : Colors.grey, // Màu nền nút
-          ),
-        ),
-        SizedBox(width: 12), 
-        ElevatedButton(
-          onPressed: () => filterProducts('2'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FaIcon(
-                FontAwesomeIcons.drumstickBite,
-                color: selectedCategory == '2' ? Colors.blue : Colors.black, // Màu icon
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Gà',
-                style: TextStyle(
-                  color: selectedCategory == '2' ? Colors.white : Colors.black, // Màu chữ
-                ),
-              ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedCategory == '2' ?Colors.amber[400]: Colors.grey, // Màu nền nút
-          ),
-        ),
-        SizedBox(width: 12), 
-        ElevatedButton(
-          onPressed: () => filterProducts('3'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FaIcon(
-                FontAwesomeIcons.bowlRice,
-                color: selectedCategory == '3' ? Colors.white : Colors.black, // Màu icon
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Mỳ',
-                style: TextStyle(
-                  color: selectedCategory == '3' ? Colors.white : Colors.white, // Màu chữ
-                ),
-              ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedCategory == '3' ? Colors.amber : Colors.grey, // Màu nền nút
-          ),
-        ),
-        SizedBox(width: 12), 
-        ElevatedButton(
-          onPressed: () => filterProducts('4'),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FaIcon(
-                FontAwesomeIcons.glassMartini,
-                color: selectedCategory == '4' ? Colors.white : Colors.black, // Màu icon
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Thức uống',
-                style: TextStyle(
-                  color: selectedCategory == '4' ? Colors.white : Colors.white, // Màu chữ
-                ),
-              ),
-            ],
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedCategory == '4' ? Colors.amber : Colors.grey, // Màu nền nút
-          ),
-        ),
-        
-      ],
-    ),
-  ),
-),
+            ),
 
             Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildCategoryButton('1', 'Pizza', FontAwesomeIcons.pizzaSlice),
+                    _buildCategoryButton('2', 'Gà', FontAwesomeIcons.drumstickBite),
+                    _buildCategoryButton('3', 'Mỳ', FontAwesomeIcons.bowlRice),
+                    _buildCategoryButton('4', 'Thức uống', FontAwesomeIcons.glassMartini),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
               child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 3 / 5,
                   crossAxisSpacing: 8,
@@ -201,45 +190,24 @@ class _ScreennState extends State<Screenn> {
                   double originalPrice = double.tryParse(product['gia']) ?? 0;
                   double discountedPrice = originalPrice;
                   String saleLabel = "";
-                  double discountPercentage = 0;
 
-                 
                   if (product['loai_khuyen_mai'] == 'PHANTRAM' &&
                       product['gia_tri_khuyen_mai'] != null) {
-                    double discount =
-                        double.tryParse(product['gia_tri_khuyen_mai']) ?? 0;
+                    double discount = double.tryParse(product['gia_tri_khuyen_mai']) ?? 0;
                     discountedPrice = originalPrice * (1 - discount / 100);
-                    discountPercentage = discount;
-
-                    if (discountedPrice == originalPrice) {
-                      saleLabel = "";
-                    } else {
-                      saleLabel = "${discountPercentage.toStringAsFixed(0)}% OFF";
-                    }
+                    saleLabel = "${discount.toStringAsFixed(0)}% OFF";
                   } else if (product['loai_khuyen_mai'] == 'GIATRI' &&
                       product['gia_tri_khuyen_mai'] != null) {
-                    double discountValue =
-                        double.tryParse(product['gia_tri_khuyen_mai']) ?? 0;
+                    double discountValue = double.tryParse(product['gia_tri_khuyen_mai']) ?? 0;
                     discountedPrice = originalPrice - discountValue;
-
-                    if (discountedPrice < 0) {
-                      discountedPrice = 0;
-                    }
-
-                    if (discountValue > 0) {
-                      saleLabel = "SALE SỐC";
-                    }
+                    saleLabel = discountValue > 0 ? "SALE SỐC" : "";
                   }
 
-                  bool isOutOfStock = product['so_luong_ton_kho'] == 0;
-
                   return GestureDetector(
-                    onTap: isOutOfStock
-                        ? null
-                        : () {
-                            final updatedProduct =
+                    onTap: () {
+                      final updatedProduct =
                                 Map<String, dynamic>.from(product);
-                            updatedProduct['discountPercentage'] = discountPercentage;
+                            updatedProduct['discountPercentage'] = discountedPrice;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -247,132 +215,76 @@ class _ScreennState extends State<Screenn> {
                                     ProductDetailPage(product: updatedProduct),
                               ),
                             );
-                          },
+                    },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isOutOfStock
-                            ? Colors.grey.withOpacity(0.5)
-                            : Color.fromARGB(255, 215, 169, 0),
+                        color: Colors.orange[100],
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.3),
                             spreadRadius: 2,
                             blurRadius: 12,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
                       child: Stack(
                         children: [
+                          // Hình ảnh sản phẩm
                           Container(
                             width: double.infinity,
                             height: MediaQuery.of(context).size.width / 2,
-                            child: Image(
-                              image: NetworkImage(
-                                  '${AppConstants.BASE_URL}${product['hinh_anh']}'),
+                            child: Image.network('${AppConstants.BASE_URL}${product['hinh_anh']}',
                               fit: BoxFit.cover,
                             ),
                           ),
-                          if (isOutOfStock)
-                            Container(
-                              color: Colors.grey.withOpacity(0.5),
-                            ),
-                          if (isOutOfStock)
-                            Positioned.fill(
-                              child: Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  color: Colors.black.withOpacity(0.7),
-                                  child: Text(
-                                    "Hết hàng",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
+                          // Gắn nhãn giảm giá
                           if (saleLabel.isNotEmpty)
                             Positioned(
                               top: 8,
                               right: 8,
                               child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 5),
                                 decoration: BoxDecoration(
                                   color: Colors.red,
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                                 child: Text(
                                   saleLabel,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ),
+                          // Tên và giá sản phẩm
                           Positioned(
-                            bottom: 50,
-                            left: 8,
-                            right: 8,
-                            child: Text(
-                              product['ten_san_pham'],
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 1,
+                            bottom: 10,
                             left: 8,
                             right: 8,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  discountedPrice != originalPrice
-                                      ? '${numberFormat.format(discountedPrice.toInt())} VND'
-                                      : '${numberFormat.format(originalPrice.toInt())} VND',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: discountedPrice < originalPrice
-                                        ? Colors.red
-                                        : Colors.black,
+                                  product['ten_san_pham'],
+                                  style: const TextStyle(
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold,
                                   ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                Row(
-                                  children: [
-                                    if (discountedPrice != originalPrice)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 4.0),
-                                        child: Text(
-                                          '${numberFormat.format(originalPrice.toInt())} VND',
-                                          style: TextStyle(
-                                            color: Colors.grey,
-                                            decoration: TextDecoration.lineThrough,
-                                          ),
-                                        ),
-                                      ),
-                                    if (discountPercentage > 0)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 4.0),
-                                        child: Text(
-                                          " -$discountPercentage%",
-                                          style: TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  "${numberFormat.format(discountedPrice)} VND",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -389,4 +301,22 @@ class _ScreennState extends State<Screenn> {
       ),
     );
   }
+
+  Widget _buildCategoryButton(String id, String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: ElevatedButton.icon(
+        onPressed: () => filterProducts(id),
+        icon: Icon(icon, color: selectedCategory == id ? Colors.orange : Colors.black),
+        label: Text(
+          title,
+          style: TextStyle(color: selectedCategory == id ? Colors.white : Colors.black),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: selectedCategory == id ? Colors.orange : Colors.grey,
+        ),
+      ),
+    );
+  }
 }
+

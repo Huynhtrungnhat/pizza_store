@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data'; 
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -19,24 +19,24 @@ class _EditProductPageState extends State<EditProductPage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  TextEditingController stockController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
-  XFile? _image;
   TextEditingController promotionValueController = TextEditingController();
+  XFile? _image;
   String? _selectedPromotionType;
+  String? maloaisp;
+  String? sizepiza;
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-
-    nameController.text = widget.product['ten_san_pham'];
-    priceController.text = widget.product['gia'].toString();
+    nameController.text = widget.product['ten_san_pham'] ?? '';
+    priceController.text = widget.product['gia']?.toString() ?? '0';
     descriptionController.text = widget.product['mo_ta'] ?? '';
-    stockController.text = widget.product['so_luong_ton_kho'].toString();
-    imageUrlController.text = AppConstants.BASE_URL + widget.product['hinh_anh'] ?? '';
+    imageUrlController.text =AppConstants.BASE_URL + (widget.product['hinh_anh'] ?? '');
+    maloaisp = widget.product['ma_loai']?.toString();
     _selectedPromotionType = widget.product['loai_khuyen_mai'];
-    promotionValueController.text = widget.product['gia_tri_khuyen_mai'] ?? '0';
+    promotionValueController.text =widget.product['gia_tri_khuyen_mai']?.toString() ?? '0';
   }
 
   Future<String?> _convertImageToBase64(XFile imageFile) async {
@@ -48,47 +48,54 @@ class _EditProductPageState extends State<EditProductPage> {
       return null;
     }
   }
+
   Future<String> _convertUrlToBase64(String imageUrl) async {
-  try {
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      // Chuyển đổi dữ liệu hình ảnh thành base64
-      return 'data:image/jpeg;base64,' + base64Encode(response.bodyBytes);
-    } else {
-      throw Exception('Không thể tải ảnh');
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return 'data:image/jpeg;base64,' + base64Encode(response.bodyBytes);
+      } else {
+        throw Exception('Không thể tải ảnh');
+      }
+    } catch (e) {
+      print('Lỗi khi chuyển đổi URL thành base64: $e');
+      return '';
     }
-  } catch (e) {
-    print('Lỗi khi chuyển đổi URL thành base64: $e');
-    return '';
   }
-}
 
-
-  // Pick image from gallery
   Future<void> _pickImage() async {
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
     setState(() {
       _image = pickedImage;
     });
   }
-  Future<void> updateProduct(String ten_san_pham, String mota, int gia, int so_luong_ton_kho,
-      int ma_loai_san_pham, String ma_loai, String loai_khuyen_mai, int gia_tri_khuyen_mai, String Hinhanh) async {
-    final url = Uri.parse('${AppConstants.ALL_PRODUCT_URI}/${widget.product['ma_san_pham']}'); 
-    print(widget.product['ma_san_pham']);
+
+  Future<void> updateProduct(
+    String tenSanPham,
+    String moTa,
+    int gia,
+   // String size,
+    String maLoai,
+    String loaiKhuyenMai,
+    int giaTriKhuyenMai,
+    String hinhAnh,
+  ) async {
+    final url = Uri.parse(
+        '${AppConstants.ALL_PRODUCT_URI}/${widget.product['ma_san_pham']}');
     try {
       final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'ten_san_pham': ten_san_pham,
-          'mo_ta': mota,
+          'ten_san_pham': tenSanPham,
+          'mo_ta': moTa,
           'gia': gia,
-          'so_luong_ton_kho': so_luong_ton_kho,
-          'ma_loai_san_pham': ma_loai_san_pham,
-          'ma_loai': ma_loai,
-          'loai_khuyen_mai': loai_khuyen_mai,
-          'gia_tri_khuyen_mai': gia_tri_khuyen_mai,
-          'hinh_anh': Hinhanh, 
+          'size': "M",
+          'ma_loai': maLoai,
+          'loai_khuyen_mai': loaiKhuyenMai,
+          'gia_tri_khuyen_mai': giaTriKhuyenMai,
+          'hinh_anh': hinhAnh,
         }),
       );
 
@@ -159,11 +166,49 @@ class _EditProductPageState extends State<EditProductPage> {
                 controller: descriptionController,
                 decoration: InputDecoration(labelText: 'Mô tả'),
               ),
-              TextField(
-                controller: stockController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Số lượng tồn kho'),
+              SizedBox(height: 16),
+              Text('Mã loại sản phẩm'),
+              DropdownButton<String>(
+                value: maloaisp,
+                onChanged: (newValue) {
+                  setState(() {
+                    maloaisp = newValue;
+                  });
+                },
+                items: [
+                  {'value': '1', 'label': 'Pizza'},
+                  {'value': '2', 'label': 'Gà'},
+                  {'value': '3', 'label': 'Mỳ'},
+                  {'value': '4', 'label': 'Thức uống'}
+                ].map<DropdownMenuItem<String>>((item) {
+                  return DropdownMenuItem<String>(
+                    value: item['value'],
+                    child: Text(item['label']!),
+                  );
+                }).toList(),
               ),
+              SizedBox(height: 16),
+              if (maloaisp == '1') ...[
+                Text('Chọn size pizza'),
+                DropdownButton<String>(
+                  value: sizepiza,
+                  onChanged: (newValue) {
+                    setState(() {
+                      sizepiza = newValue;
+                    });
+                  },
+                  items: [
+                    {'value': 'M', 'label': 'Size 9 inch'}
+                  ].map<DropdownMenuItem<String>>((items) {
+                    return DropdownMenuItem<String>(
+                      value: items['value'],
+                      child: Text(items['label']!),
+                    );
+                  }).toList(),
+                ),
+              ],
+              SizedBox(height: 16),
+              Text('Chọn loại khuyến mãi'),
               DropdownButton<String>(
                 value: _selectedPromotionType,
                 onChanged: (newValue) {
@@ -171,59 +216,52 @@ class _EditProductPageState extends State<EditProductPage> {
                     _selectedPromotionType = newValue;
                   });
                 },
-                items: ['PHANTRAM', 'GIATRI'].map<DropdownMenuItem<String>>((String value) {
+                items: [
+                  {'value': 'PHANTRAM', 'label': 'Phần trăm sản phẩm'},
+                  {'value': 'GIATRI', 'label': 'Giá trị sản phẩm'}
+                ].map<DropdownMenuItem<String>>((item) {
                   return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
+                    value: item['value'],
+                    child: Text(item['label']!),
                   );
                 }).toList(),
-                hint: Text('Chọn loại khuyến mãi'),
               ),
               SizedBox(height: 16),
-
               TextField(
                 controller: promotionValueController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Giá trị khuyến mãi'),
+                decoration: InputDecoration(
+                  labelText: _selectedPromotionType == 'PHANTRAM'
+                      ? 'Nhập phần trăm giảm giá'
+                      : 'Nhập giá trị giảm giá',
+                ),
               ),
               SizedBox(height: 16),
-
-              // Save button
               ElevatedButton(
                 onPressed: () async {
-               
-                  String? base64Image = '';
+                  String base64Image = '';
                   if (_image != null) {
-                      // Nếu chọn ảnh mới, chuyển đổi nó thành base64
-                      base64Image = 'data:image/jpeg;base64,${await _convertImageToBase64(_image!)}';
-                    } else if (imageUrlController.text.isNotEmpty) {
-                      // Nếu không chọn ảnh mới, lấy URL ảnh cũ và chuyển đổi nó thành base64
-                      base64Image = await _convertUrlToBase64(imageUrlController.text);
-                    }
-                  String tenSanPham = nameController.text;
-                  String moTa = descriptionController.text;
-                  int gia = int.tryParse(priceController.text) ?? 0;
-                  int soLuongTonKho = int.tryParse(stockController.text) ?? 0;
-                  int maLoaiSanPham = widget.product['ma_loai_san_pham'] ?? 0;
-                  String maLoai = widget.product['ma_loai'] ?? 0; 
-                  String loaiKhuyenMai = _selectedPromotionType ?? '';
-                  int giaTriKhuyenMai = int.tryParse(promotionValueController.text) ?? 0;
-
-      
+                    base64Image =
+                        'data:image/jpeg;base64,${await _convertImageToBase64(_image!)}';
+                  } else if (imageUrlController.text.isNotEmpty) {
+                    base64Image =
+                        await _convertUrlToBase64(imageUrlController.text);
+                  }
                   await updateProduct(
-                    tenSanPham,
-                    moTa,
-                    gia,
-                    soLuongTonKho,
-                    maLoaiSanPham,
-                    maLoai,
-                    loaiKhuyenMai,
-                    giaTriKhuyenMai,
-                    base64Image ?? '',
+                    nameController.text,
+                    descriptionController.text,
+                    int.tryParse(priceController.text) ?? 0,
+                    maloaisp ?? '',
+                   
+                    _selectedPromotionType ?? '',
+                    // sizepiza??"",
+                    int.tryParse(promotionValueController.text) ?? 0,
+                    base64Image,
                   );
+
+                  Navigator.pop(context);
                 },
-                
-                child: Text('Lưu'),
+                child: Text('Lưu sản phẩm'),
               ),
             ],
           ),

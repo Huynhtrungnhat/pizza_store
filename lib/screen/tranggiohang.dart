@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
 import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
+import 'package:pizza_store/screen/thanhtoankethop.dart';
+import 'package:pizza_store/screen/trangCTHD.dart';
 import 'package:pizza_store/screen/trangThanhToan.dart';
 
 
@@ -108,15 +110,27 @@ class _CartPageState extends State<CartPage> {
                 return ListTile(
                   title: Text(item.ten_san_pham,
                       maxLines: 3, overflow: TextOverflow.ellipsis),
-                  subtitle: Text(
-                      '${numberFormat.format(item.gia)} VND x ${item.so_luong_ton_kho}'),
-                  leading: Image.network(
-                    '${AppConstants.BASE_URL}${item.hinh_anh}',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                  trailing: Row(
+                  subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${numberFormat.format(item.gia)} VND x ${item.so_luong_ton_kho}'),
+          SizedBox(height: 4),
+          if(item.ma_loai==1)...[
+            SingleChildScrollView(
+               scrollDirection: Axis.horizontal, 
+              child: Row(
+                
+                children: [
+                    Text(' ${item.selectedSize}'),
+                        Text('- ${item.selectedebanh}'),
+                ],
+              ),
+              
+            ),
+            
+            
+          ],
+          Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
@@ -140,6 +154,18 @@ class _CartPageState extends State<CartPage> {
                       ),
                     ],
                   ),
+                ],
+                ),
+                  leading: Container(
+                     width: 100,
+                    height: 100,
+                    child:Image.network(
+                    '${AppConstants.BASE_URL}${item.hinh_anh}',
+                    fit: BoxFit.cover,
+                  ), 
+                  )
+                  
+        
                 );
               },
             ),
@@ -160,8 +186,16 @@ class _CartPageState extends State<CartPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TrangThanhToan(),
-                            ),
+                              builder: (context) => TrangThanhToanKetHop(),
+                            //     totalPrice: 30000,
+                            //     onPaymentSuccess: ()=>{},
+                            //     onPaymentFailure: ()=>{},
+                            //   ),
+                            // ),
+                            // MaterialPageRoute(
+                            //   builder: (context) => MobilePaymentScreen(amount: 30000,onPaymentFailure: ()=>{},onPaymentSuccess: ()=>{},saveData: ()=>{},)
+                            // ),
+                          )
                           );
                         },
                   style: ElevatedButton.styleFrom(

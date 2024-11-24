@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class UserProfilePage extends StatefulWidget {
-  final String userId; // Thêm thuộc tính userId
+  final String userId;
 
   UserProfilePage({required this.userId});
 
@@ -17,10 +17,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Map<String, dynamic>? userData;
   String? errorMessage;
   bool isLoading = true;
-  String? userId; // Biến để lưu ID người dùng
+  String? userId;
 
   Future<void> fetchUserData() async {
-    // Lấy ID người dùng từ SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     userId = prefs.getString('userId');
 
@@ -54,6 +53,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     });
   }
 
+  Future<void> clearUserId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove('userId'); // Xóa ID người dùng
+  await prefs.remove('isLoggedIn'); // Xóa trạng thái đăng nhập
+
+  setState(() {
+    userId = null;
+    userData = null;
+    errorMessage = 'ID người dùng đã bị xóa!';
+    isLoading = false; // Đặt lại trạng thái tải lại dữ liệu
+  });
+
+  // Gọi lại phương thức fetchUserData để tải lại dữ liệu
+  fetchUserData();
+}
+
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +91,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ? Center(child: Text(errorMessage!, style: TextStyle(color: Colors.red, fontSize: 16)))
                   : ListView(
                       children: [
-                        // Hình ảnh container trên đầu
                         Container(
                           width: double.infinity,
                           height: 150,
@@ -91,26 +106,29 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               alignment: Alignment.center,
                               child: CircleAvatar(
                                 radius: 80,
-                                backgroundImage: NetworkImage(
-                                  // Bạn có thể thay thế URL này bằng hình ảnh avatar từ API hoặc database
-                                  userData?['avatar_url'] ?? 'https://www.example.com/avatar.jpg',
-                                ),
+                                // backgroundImage: NetworkImage(
+                                //   userData?['avatar_url'] ?? 'https://www.example.com/avatar.jpg',
+                                // ),
                               ),
                             ),
                           ),
                         ),
                         Divider(),
                         SizedBox(height: 20),
-                        // Thông tin người dùng
                         _buildDetailCard('Tên', userData?['name']),
+                         Divider(),
                         _buildDetailCard('Email', userData?['email']),
+                         Divider(),
                         _buildDetailCard('Ngày tạo', userData?['created_at']?.toString()),
-                        Divider(), // Gạch ngang phân chia
+                        Divider(),
                         SizedBox(height: 20),
-                        // Thông tin đơn hàng (giả sử bạn có thông tin này từ API)
-                        _buildOrderDetailCard('Mã đơn hàng', '12345'),
-                        _buildOrderDetailCard('Ngày tạo đơn', '2024-11-10'),
-                        _buildOrderDetailCard('Tình trạng đơn hàng', 'Đang xử lý'),
+                        ElevatedButton(
+                          onPressed:(){
+                            clearUserId();
+
+                          } ,
+                          child: Text('đăng xuất'),
+                        ),
                       ],
                     ),
             ),
@@ -145,7 +163,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Card cho thông tin đơn hàng
   Widget _buildOrderDetailCard(String title, String value) {
     return Card(
       elevation: 4,

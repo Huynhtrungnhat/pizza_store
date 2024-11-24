@@ -49,6 +49,7 @@ class _ScrenlisadState extends State<Screnlisad> {
       (value) {
         setState(() {
           cart.getTotalQuantity();
+          getData();
         });
       },
     );
@@ -56,7 +57,8 @@ class _ScrenlisadState extends State<Screnlisad> {
     @override
   void initState() {
     super.initState();
-    cart.loadCartFromSharedPreferences(); // Tải giỏ hàng từ SharedPreferences khi bắt đầu
+    cart.loadCartFromSharedPreferences();
+    getData(); // Tải giỏ hàng từ SharedPreferences khi bắt đầu
   }
 
   @override

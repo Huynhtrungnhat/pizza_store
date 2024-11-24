@@ -15,15 +15,14 @@ class ProductInputPage extends StatefulWidget {
 class _ProductInputPageState extends State<ProductInputPage> {
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _stockQuantityController =TextEditingController();
-  final TextEditingController _categoryIdController = TextEditingController();
-  final TextEditingController _promotionValueController =TextEditingController();
+  final TextEditingController _priceController = TextEditingController(text: '0');
+  final TextEditingController _promotionValueController = TextEditingController();
 
   File? _selectedImage;
   String? Chonkhuyenmai;
   String? _chonMALoai;
-
+  String? sizepiza;
+  int giasp=0;
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -40,7 +39,14 @@ class _ProductInputPageState extends State<ProductInputPage> {
     return base64Encode(imageBytes);
   }
 
-  Future<void> ThemSanPham( String ten_san_pham,String mota,int gia,int so_luong_ton_kho,int ma_loai_san_pham,String ma_loai,String loai_khuyen_mai,int gia_tri_khuyen_mai,String Hinhanh) async {
+  Future<void> ThemSanPham(
+      String ten_san_pham,
+      String mota,
+      int gia,
+      String ma_loai,
+      String loai_khuyen_mai,
+      int gia_tri_khuyen_mai,
+      String Hinhanh) async {
     final url = Uri.parse('${AppConstants.ALL_PRODUCT_URI}');
     try {
       final response = await http.post(
@@ -49,12 +55,10 @@ class _ProductInputPageState extends State<ProductInputPage> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          
           'ten_san_pham': ten_san_pham,
           'mo_ta': mota,
           'gia': gia,
-          'so_luong_ton_kho': so_luong_ton_kho,
-          'ma_loai_san_pham': ma_loai_san_pham,
+          'size': "M",
           'ma_loai': ma_loai,
           'loai_khuyen_mai': loai_khuyen_mai,
           'gia_tri_khuyen_mai': gia_tri_khuyen_mai,
@@ -66,13 +70,15 @@ class _ProductInputPageState extends State<ProductInputPage> {
         print('Sản phẩm đã được thêm thành công');
         print('Response body: ${response.body}');
       } else {
-          print('Lỗi khi thêm sản phẩm. Mã lỗi: ${response.statusCode}');
-          print('Response body: ${response.body}');
+        print('Lỗi khi thêm sản phẩm. Mã lỗi: ${response.statusCode}');
+        print('Response body: ${response.body}');
       }
     } catch (error) {
       print('Lỗi khi thực hiện yêu cầu: $error');
     }
   }
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,33 +124,11 @@ class _ProductInputPageState extends State<ProductInputPage> {
                 ),
                 maxLines: 3,
               ),
+             
+             
               SizedBox(height: 10),
-              TextField(
-                controller: _priceController,
-                decoration: InputDecoration(
-                  labelText: 'Giá',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
+           
               SizedBox(height: 10),
-              TextField(
-                controller: _stockQuantityController,
-                decoration: InputDecoration(
-                  labelText: 'Số lượng tồn kho',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _categoryIdController,
-                decoration: InputDecoration(
-                  labelText: 'Mã loại sản phẩm',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-              ),SizedBox(height: 10),
               // DropdownMenu cho loại khuyến mãi
               DropdownButtonFormField<String>(
                 value: _chonMALoai,
@@ -176,10 +160,62 @@ class _ProductInputPageState extends State<ProductInputPage> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 10),
+             
+               SizedBox(height: 10),
+              TextField(
+                controller: _priceController,
+                onChanged: (value) {
+                  setState(() {
+                    if(_priceController.text.isEmpty)
+                    {
+                    giasp=0;
+                   
+                    }
+                    else{
+                    giasp=int.parse(_priceController.text);
+                    
+                    }
+                    _priceController.text=giasp.toString();
+
+                  });
+                },
+                decoration: InputDecoration(
+                  labelText: 'Giá', 
+               
+                  suffix:Text(_chonMALoai == '1'?'Size 9 Inch':''),
               
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
               SizedBox(height: 10),
-              // DropdownMenu cho loại khuyến mãi
+           
+              if(_chonMALoai=='1')
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child: Text("Size 12 Inch - ${giasp+100000}"),
+                  ),
+               SizedBox(height: 16),
+              // if (_chonMALoai == '1') ...[
+              
+              //   DropdownButton<String>(
+              //     value: sizepiza,
+              //     onChanged: (newValue) {
+              //       setState(() {
+              //         sizepiza = newValue;
+              //       });
+              //     },
+              //     items: [
+              //       {'value': 'M', 'label': 'Size 9 inch'}
+              //     ].map<DropdownMenuItem<String>>((items) {
+              //       return DropdownMenuItem<String>(
+              //         value: items['value'],
+              //         child: Text(items['label']!),
+              //       );
+              //     }).toList(),
+              //   ),
+              //    Text('Size 12 Inch - ${int.parse(_priceController.text)+100000}'),
+              // ],
               DropdownButtonFormField<String>(
                 value: Chonkhuyenmai,
                 onChanged: (String? newValue) {
@@ -217,25 +253,22 @@ class _ProductInputPageState extends State<ProductInputPage> {
                   final productName = _productNameController.text;
                   final description = _descriptionController.text;
                   final price = int.parse(_priceController.text);
-                  final stockQuantity = int.parse(_stockQuantityController.text);
-                  final categoryId = int.parse(_categoryIdController.text);
                   final promotionType = Chonkhuyenmai ?? '';
                   final Maloai = _chonMALoai ?? '';
-                  final promotionValue = int.parse(_promotionValueController.text);
+                  final promotionValue =int.parse(_promotionValueController.text);
                   String? base64Image = '';
                   if (_selectedImage != null) {
-                    base64Image = 'data:image/jpeg;base64,' + await _convertImageToBase64(_selectedImage!);
+                    base64Image = 'data:image/jpeg;base64,' +
+                        await _convertImageToBase64(_selectedImage!);
                   }
-
-                  ThemSanPham(productName,description, price,stockQuantity, categoryId,Maloai,promotionType,
- promotionValue, base64Image);
- Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CurveBar(),
-    ),
-    (route) => false, 
-  );
+                  ThemSanPham(productName, description, price, Maloai,promotionType, promotionValue, base64Image);
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CurveBar(),
+                    ),
+                    (route) => false,
+                  );
 
                   // print('Tên sản phẩm: $productName');
                   // print('Mô tả: $description');

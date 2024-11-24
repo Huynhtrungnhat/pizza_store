@@ -1,5 +1,11 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:pizza_store/admin/addnhanvien.dart';
+import 'package:pizza_store/admin/addsanpham.dart';
+import 'package:pizza_store/admin/adminscreen.dart';
+import 'package:pizza_store/admin/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/trangQuanLyDonHang.dart';
+
 import 'package:pizza_store/login/regisiter.dart';
 import 'package:pizza_store/models/layidnguoidung.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
@@ -8,12 +14,14 @@ import 'package:pizza_store/home/home_page.dart';
 import 'package:pizza_store/navigationbottom/profile_page.dart';
 import 'package:pizza_store/navigationbottom/shopcash.dart';
 import 'package:pizza_store/screen/Trangcanhan.dart';
-import 'package:pizza_store/admin/addsanpham.dart';
 import 'package:pizza_store/admin/adminlistscren.dart';
+import 'package:pizza_store/screen/fechdatakhhpadon.dart';
+import 'package:pizza_store/screen/thanhtoankethop.dart';
 import 'package:pizza_store/screen/themkhuyenmai.dart';
+import 'package:pizza_store/screen/trangCTHD.dart';
+import 'package:pizza_store/screen/trangdonhang.dart';
 import 'package:pizza_store/screen/tranggiohang.dart';
-import '../home/sanpham.dart';
-import '../login/login.dart';
+
  // Đảm bảo import AuthService
 
 class CurveBar extends StatefulWidget {
@@ -25,7 +33,8 @@ class CurveBar extends StatefulWidget {
 
 class _CurveBarState extends State<CurveBar> {
   int index = 0;
-  String? userId; // Khai báo biến userId
+  String? userId; 
+  int madangnhap=0;// Khai báo biến userId
 
   @override
   void initState() {
@@ -35,6 +44,7 @@ class _CurveBarState extends State<CurveBar> {
 
   Future<void> _loadUserId() async {
     userId = await AuthService.getUserId(); 
+    // madangnhap = (await AuthService.getUserId()) as int; 
     setState(() {}); 
   }
 
@@ -49,16 +59,15 @@ class _CurveBarState extends State<CurveBar> {
 
     final screen = [
       detailsanpham(),
-      userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')), // Cung cấp thông báo nếu userId là null
-      ProductInputPage(),
-     Screnlisad(),
-     
+      AdminPage(),
+      userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')),
+      QuanLyDonHangkh(),
     ];
 
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 200, 233, 239),
       extendBody: true,
-      body: screen[index], // Chọn trang theo index
+      body: screen[index], 
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           iconTheme: const IconThemeData(

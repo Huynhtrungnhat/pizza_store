@@ -1,16 +1,14 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_store/admin/adminscreen.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/login/regisiter.dart';
 import 'package:pizza_store/models/layidnguoidung.dart';
 import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
-import 'package:pizza_store/screen/Trangcanhan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../models/user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginPage extends StatefulWidget {
   @override
@@ -25,61 +23,72 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>(); 
   bool _isLoading = false; 
 
+  Future<void> login() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
 
-
-Future<void> login() async {
-  if (_formKey.currentState!.validate()) {
-    setState(() {
-      _isLoading = true; 
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse('${AppConstants.Login}'), 
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(<String, String>{
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
-      );
-
-      if (response.statusCode == 202) {
-        final responseData = jsonDecode(response.body);
-       final String userId = responseData['user']['id'].toString(); 
-
-        await AuthService.saveUserId(userId);
-        await setLoginStatus(true);
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => CurveBar()),
+      try {
+        final response = await http.post(
+          Uri.parse('${AppConstants.Login}'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(<String, String>{
+            'email': _emailController.text,
+            'password': _passwordController.text,
+          }),
         );
-      } else {
+
+        if (response.statusCode == 202) {
+
+          final responseData = jsonDecode(response.body);
+         
+          final String userId = responseData['user']['id'].toString()??"";
+          final String userRole = responseData['user']['quyen']??""; // Lấy quyền người dùng
+
+          await AuthService.saveUserId(userId);
+          await setLoginStatus(true);
+
+          if (userRole == 'admin') {
+           Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (context) => AdminPage(),
+    ),
+    (route) => false, 
+  );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => CurveBar()),
+            );
+          }
+        } else {
+          setState(() {
+            _message = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin tài khoản.';
+          });
+        }
+      } catch (e) {
         setState(() {
-          _message = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin tài khoản.';
+          _message = 'Đã xảy ra lỗi: $e';
+        });
+      } finally {
+        setState(() {
+          _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _message = 'Đã xảy ra lỗi: $e';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false; 
-      });
     }
   }
-}
 
-Future<void> setLoginStatus(bool isLoggedIn) async {
+  Future<void> setLoginStatus(bool isLoggedIn) async {
     final prefs = await SharedPreferences.getInstance();
-     await prefs.setBool('isLoggedIn', isLoggedIn); // Lưu trạng thái đăng nhập
- }
+    await prefs.setBool('isLoggedIn', isLoggedIn); // Lưu trạng thái đăng nhập
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: Text('Đăng Nhập')),
       backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -110,7 +119,7 @@ Future<void> setLoginStatus(bool isLoggedIn) async {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập email.'; 
                     } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                      return 'Vui lòng nhập địa chỉ email hợp lệ.'; // Kiểm tra định dạng email
+                      return 'Vui lòng nhập địa chỉ email hợp lệ.'; 
                     }
                     return null; 
                   },
@@ -138,7 +147,7 @@ Future<void> setLoginStatus(bool isLoggedIn) async {
                       return 'Vui lòng nhập mật khẩu.';
                     } else if (value.length < 6) {
                       return 'Mật khẩu phải có ít nhất 6 ký tự.'; 
-                           }
+                    }
                     return null;
                   },
                 ),
