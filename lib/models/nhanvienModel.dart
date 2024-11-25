@@ -8,9 +8,7 @@ class NhanVien {
   final String email;
   final String sdt;
   final int trangThai;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
+  final String? updated_at;
   NhanVien({
     required this.maNhanVien,
     required this.tenNhanVien,
@@ -21,8 +19,7 @@ class NhanVien {
     required this.email,
     required this.sdt,
     required this.trangThai,
-    required this.createdAt,
-    required this.updatedAt,
+     this.updated_at,
   });
 
   factory NhanVien.fromJson(Map<String, dynamic> json) {
@@ -36,8 +33,20 @@ class NhanVien {
       email: json['email'],
       sdt: json['sdt'],
       trangThai: json['trang_thai'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      updated_at: json['updated_at'],
     );
+  }
+  // Phương thức để chuyển từ NhanVien object sang JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'ma_nhan_vien': maNhanVien,
+      'ten_nhan_vien': tenNhanVien,
+      'ngay_sinh': ngaySinh,
+      'gioi_tinh': gioiTinh,
+      'dia_chi': diaChi,
+      'email': email,
+      'sdt': sdt,
+      'trang_thai': trangThai,
+    };
   }
 }

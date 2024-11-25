@@ -63,7 +63,7 @@ void _startListening() async {
    
     showDialog(
       context: context,
-      barrierDismissible: false, // Không cho đóng dialog khi nhấn ra ngoài
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
        title: Row(
             children: [
@@ -87,12 +87,11 @@ void _startListening() async {
       if (Navigator.canPop(context)) {
 
         Navigator.of(context).pop();
-        _stopListening(); // Đóng dialog sau 3 giây
+        _stopListening(); 
       }
     });
     
 
-    // Bắt đầu lắng nghe giọng nói
     _speech.listen(
       onResult: (result) {
         setState(() {
@@ -105,7 +104,7 @@ void _startListening() async {
         if (result.recognizedWords.isNotEmpty) {
           if (Navigator.canPop(context)) {
             Navigator.of(context).pop();
-             _stopListening(); // Đóng dialog ngay lập tức
+             _stopListening(); 
           }
         }
       },
@@ -143,7 +142,7 @@ void _startListening() async {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _textController, // Kết nối với TextController
+                      controller: _textController, 
                       onChanged: (value) => searchProducts(value),
                       decoration: const InputDecoration(
                         hintText: "Nhập tên sản phẩm...",
@@ -231,7 +230,7 @@ void _startListening() async {
                       ),
                       child: Stack(
                         children: [
-                          // Hình ảnh sản phẩm
+                         
                           Container(
                             width: double.infinity,
                             height: MediaQuery.of(context).size.width / 2,
@@ -239,7 +238,7 @@ void _startListening() async {
                               fit: BoxFit.cover,
                             ),
                           ),
-                          // Gắn nhãn giảm giá
+                       
                           if (saleLabel.isNotEmpty)
                             Positioned(
                               top: 8,
@@ -260,7 +259,7 @@ void _startListening() async {
                                 ),
                               ),
                             ),
-                          // Tên và giá sản phẩm
+                
                           Positioned(
                             bottom: 10,
                             left: 8,

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/admin/addnhanvien.dart';
-import 'package:pizza_store/admin/adminlistscren.dart';
-import 'package:pizza_store/admin/trangquanlynahnvien.dart';
+import 'package:pizza_store/admin/timkhtheohoadon.dart';
 
-import '../screen/listnhanvien.dart';
+import 'package:pizza_store/admin/trangQuanLyDonHang.dart';
+import 'package:pizza_store/screen/listkhuyenmai.dart';
+import 'package:pizza_store/screen/themkhuyenmai.dart';
 
-class adminpagenhanvien extends StatelessWidget {
+
+class Adminpagekhuyenmai extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Trang Quản Lý Khách hàng'),
+        title: Text('Trang Quản Lý Khuyến mãi'),
         centerTitle: true,
       ),
       body: Padding(
@@ -19,24 +20,18 @@ class adminpagenhanvien extends StatelessWidget {
           children: [
             _buildAdminOption(
               context,
-              'Thêm Nhân viên mới ',
+              'Cập nhật Trạng thái khuyến mãi ',
               Icons.category,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) =>ThemNhanVienPage() ),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) =>Addkhuyenmaiad() ),
             ),),
             _buildAdminOption(
               context,
-              'Cập nhật thông tin nhân viên (Tên, Số điện thoại, Email, Địa chỉ).',
+              'Thêm khuyến mãi',
               Icons.shopping_bag,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) => NhanVienListScreen()),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) => Addkhuyenmaiad()),
               ),
               ),
-            _buildAdminOption(
-              context,
-              'Phân quyền cho Nhân viên',
-              Icons.people,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) => nhanvienpermetion()),
-              ),
-            ),
+           
           ],
         ),
       ),

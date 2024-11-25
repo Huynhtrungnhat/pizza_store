@@ -209,8 +209,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Màu của nút
-                    padding: EdgeInsets.symmetric(vertical: 15), // Kích thước nút
+                    backgroundColor: Colors.red,
+                    padding: EdgeInsets.symmetric(vertical: 15), 
                   ),
                   child: Text('Tạo Tài khoản ', style: TextStyle(fontSize: 16)),
                 ),

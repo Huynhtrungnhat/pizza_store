@@ -197,8 +197,6 @@ class _AddkhuyenmaiadState extends State<Addkhuyenmaiad> {
                 ),
               ),
               SizedBox(height: 16),
-
-              // TextField for description
               TextField(
                 controller: descriptionController,
                 decoration: InputDecoration(labelText: 'Mô tả khuyến mãi'),

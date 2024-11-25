@@ -40,12 +40,11 @@ class _CustomerManagementPageState extends State<CustomerManagementPage> {
     }
   }
 
-  // Tìm kiếm khách hàng theo số điện thoại
   Future<void> searchCustomerByPhone() async {
     var response = await http.get(Uri.parse('$apiUrl/${searchController.text}'));
     print('Response body: ${response.body}');
 
-    if (response.statusCode == 201) { // Kiểm tra mã trạng thái 200 (thành công)
+    if (response.statusCode == 201) { 
       var data = json.decode(response.body);
 
       if (data['khachhang'] != null) {
@@ -56,7 +55,7 @@ class _CustomerManagementPageState extends State<CustomerManagementPage> {
           phoneController.text = customer['sdt'] ?? '';
        //   emailController.text = ''; // Giả sử bạn không nhận email từ API
           addressController.text = customer['diachi'] ?? '';
-          customerId = customer['ma_khach_hang']; // Lưu lại mã khách hàng
+          customerId = customer['ma_khach_hang']; 
           customerDetails = 'Thông tin khách hàng đã được tìm thấy';
           isCustomerFound = true;
         });
@@ -83,7 +82,6 @@ class _CustomerManagementPageState extends State<CustomerManagementPage> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Tìm kiếm khách hàng theo số điện thoại
               TextField(
                 controller: searchController,
                 decoration: InputDecoration(
@@ -149,12 +147,12 @@ class _CustomerManagementPageState extends State<CustomerManagementPage> {
                       SizedBox(width: 10),
                        ElevatedButton(
                         onPressed: () async {
-                          if (customerId != null) {
-                            updateCustomer(customerId); 
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Không tìm thấy mã khách hàng')));
-                          }
+                          // if (customerId != null) {
+                          //   updateCustomer(customerId); 
+                          // } else {
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //       SnackBar(content: Text('Không tìm thấy mã khách hàng')));
+                          // }
                         },
                         child: Text('Xem Đơn Hàng',style: TextStyle(color: Colors.orange,),),
                         ) ,

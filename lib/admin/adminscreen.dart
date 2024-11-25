@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/admin/adminpagedonhang.dart';
+import 'package:pizza_store/admin/adminpagekhuyenmai.dart';
 import 'package:pizza_store/admin/adminpagenhanvien.dart';
 import 'package:pizza_store/admin/adminpagesanpham.dart';
 import 'package:pizza_store/admin/adminquanlykh.dart';
@@ -12,10 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AdminPage extends StatelessWidget {
   Future<void> clearUserId(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userId'); // Xóa ID người dùng
-    await prefs.remove('isLoggedIn'); // Xóa trạng thái đăng nhập
-
-    // Điều hướng quay lại trang đăng nhập hoặc trang khác
+    await prefs.remove('userId'); 
+    await prefs.remove('isLoggedIn'); 
     Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
@@ -78,7 +77,7 @@ class AdminPage extends StatelessWidget {
               Icons.card_giftcard,
               () =>Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddKhuyenMaiPage()),
+                MaterialPageRoute(builder: (context) => Adminpagekhuyenmai()),
               ),
             ),
           ],

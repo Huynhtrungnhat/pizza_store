@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:pizza_store/api/controller.dart';
+
 class AddKhuyenMaiPage extends StatefulWidget {
   @override
   _AddKhuyenMaiPageState createState() => _AddKhuyenMaiPageState();
@@ -10,20 +12,17 @@ class AddKhuyenMaiPage extends StatefulWidget {
 class _AddKhuyenMaiPageState extends State<AddKhuyenMaiPage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Các controller để nhập dữ liệu
   TextEditingController tenKhuyenMaiController = TextEditingController();
   TextEditingController apDungTuNgayController = TextEditingController();
   TextEditingController apDungDenNgayController = TextEditingController();
   String? doiTuongApDungController;
 
-  bool trangThai = true; // Trạng thái của khuyến mãi
+  bool trangThai = true; 
 
-  // Các giá trị cho dropdown menu
   List<String> doiTuongList = ['HOADON', 'SANPHAM'];
 
-  // Hàm gửi yêu cầu API
   Future<void> addKhuyenMai() async {
-    final url = 'http://172.20.10.9:8000/api/khuyen_mai'; // Thay bằng URL của bạn
+    final url = '${AppConstants.khuyenmai}'; 
     final response = await http.post(
       Uri.parse(url),
       body: jsonEncode({
@@ -35,7 +34,6 @@ class _AddKhuyenMaiPageState extends State<AddKhuyenMaiPage> {
       }),
       headers: {
         'Content-Type': 'application/json',
-        // Thêm token nếu cần
       },
     );
 
@@ -55,7 +53,6 @@ class _AddKhuyenMaiPageState extends State<AddKhuyenMaiPage> {
     }
   }
 
-  // Hàm chọn ngày
   Future<void> _selectDate(BuildContext context, TextEditingController controller) async {
     final DateTime? selectedDate = await showDatePicker(
       context: context,

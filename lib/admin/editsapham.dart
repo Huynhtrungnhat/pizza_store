@@ -252,9 +252,7 @@ class _EditProductPageState extends State<EditProductPage> {
                     descriptionController.text,
                     int.tryParse(priceController.text) ?? 0,
                     maloaisp ?? '',
-                   
                     _selectedPromotionType ?? '',
-                    // sizepiza??"",
                     int.tryParse(promotionValueController.text) ?? 0,
                     base64Image,
                   );

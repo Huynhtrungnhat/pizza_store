@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/admin/timkhtheohoadon.dart';
 import 'package:pizza_store/admin/timkiemtheosdtupdate.dart';
-import 'package:pizza_store/admin/trangCTDonHang.dart';
 
 class adminpagkhachhang extends StatelessWidget {
   @override

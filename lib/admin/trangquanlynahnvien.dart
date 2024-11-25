@@ -20,7 +20,6 @@ class _nhanvienpermetionState extends State<nhanvienpermetion> {
 
   final String apiUrl = '${AppConstants.User_all}';
 
-  // Danh sách quyền
   final List<String> roles = ['admin', 'user', 'nv', ''];
 
   Future<void> searchCustomerByPhone() async {
@@ -39,7 +38,6 @@ class _nhanvienpermetionState extends State<nhanvienpermetion> {
             selectedRole = customer['quyen'];
             isCustomerFound = true;
 
-            // Kiểm tra quyền
             if (selectedRole != 'admin') {
               customerDetails = 'Tài khoản không có quyền admin. Không thể chỉnh sửa.';
               isCustomerFound = false;

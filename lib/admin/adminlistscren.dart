@@ -4,11 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/admin/listproductad.dart';
-
-import 'package:pizza_store/screen/manhinhchung.dart';
-
 import '../models/sanphamcart.dart';
-import 'adminlistscren.dart';
+
 import '../screen/tranggiohang.dart';
 
 class Screnlisad extends StatefulWidget {
@@ -58,7 +55,7 @@ class _ScrenlisadState extends State<Screnlisad> {
   void initState() {
     super.initState();
     cart.loadCartFromSharedPreferences();
-    getData(); // Tải giỏ hàng từ SharedPreferences khi bắt đầu
+    getData(); 
   }
 
   @override

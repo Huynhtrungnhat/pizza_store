@@ -30,13 +30,13 @@ class ChiTietHoaDonScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Mã chi tiết hóa đơn: ${chiTietHoaDon.maChiTietHoaDon}',
-                  style: TextStyle(fontSize: 18),
-                ),
+                // Text(
+                //   'Mã chi tiết hóa đơn: ${chiTietHoaDon.maChiTietHoaDon}',
+                //   style: TextStyle(fontSize: 18),
+                // ),
                 SizedBox(height: 10),
-                Text('Mã hóa đơn: ${chiTietHoaDon.maHoaDon}'),
-                Text('Mã sản phẩm: ${chiTietHoaDon.maSanPham}'),
+                Text('Mã hóa đơn: ${chiTietHoaDon.maChiTietHoaDon}'),
+                Text('Mã sản phẩm: ${chiTietHoaDon.giaKhuyenMai}'),
                 Text('Số lượng: ${chiTietHoaDon.soLuong}'),
                 Text('Giá: ${chiTietHoaDon.gia}'),
                 Text('Giá khuyến mãi: ${chiTietHoaDon.giaKhuyenMai}'),

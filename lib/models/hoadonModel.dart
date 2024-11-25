@@ -1,9 +1,11 @@
+import 'package:pizza_store/models/khachhnag.dart';
+
 class HoaDon {
   final int ma_hoa_don;
   final String? ngay_lap_hd;
   final double tong_tien;
   final int ma_nhan_vien;
-  final int ma_khach_hang;
+final KhachHang? khachHang;
   final String createdAt;
   final String updatedAt;
   String trang_thai;
@@ -14,7 +16,7 @@ class HoaDon {
     this.ngay_lap_hd,
     required this.tong_tien,
     required this.ma_nhan_vien,
-    required this.ma_khach_hang,
+    this.khachHang,
     required this.createdAt,
     required this.updatedAt,
     required this.trang_thai,
@@ -27,7 +29,9 @@ class HoaDon {
       ngay_lap_hd: json['ngay_lap_hd'],
       tong_tien: double.tryParse(json['tong_tien'].toString()) ?? 0.0,
       ma_nhan_vien: json['ma_nhan_vien'] ?? '',
-      ma_khach_hang: json['ma_khach_hang']?? '',
+       khachHang: json['ma_khach_hang'] != null
+          ? KhachHang.fromJson(json['ma_khach_hang'])
+          : null,
       createdAt: json['createdAt']?? '',
       updatedAt: json['updatedAt']?? '',
       trang_thai: json['trang_thai']?? '',

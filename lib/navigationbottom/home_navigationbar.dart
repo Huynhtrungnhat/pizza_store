@@ -16,13 +16,15 @@ import 'package:pizza_store/navigationbottom/shopcash.dart';
 import 'package:pizza_store/screen/Trangcanhan.dart';
 import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/screen/fechdatakhhpadon.dart';
+import 'package:pizza_store/screen/listkhuyenmai.dart';
 import 'package:pizza_store/screen/thanhtoankethop.dart';
 import 'package:pizza_store/screen/themkhuyenmai.dart';
 import 'package:pizza_store/screen/trangCTHD.dart';
 import 'package:pizza_store/screen/trangdonhang.dart';
 import 'package:pizza_store/screen/tranggiohang.dart';
 
- // Đảm bảo import AuthService
+import '../screen/listnhanvien.dart';
+
 
 class CurveBar extends StatefulWidget {
   const CurveBar({super.key});
@@ -34,7 +36,6 @@ class CurveBar extends StatefulWidget {
 class _CurveBarState extends State<CurveBar> {
   int index = 0;
   String? userId; 
-  int madangnhap=0;// Khai báo biến userId
 
   @override
   void initState() {
@@ -44,7 +45,6 @@ class _CurveBarState extends State<CurveBar> {
 
   Future<void> _loadUserId() async {
     userId = await AuthService.getUserId(); 
-    // madangnhap = (await AuthService.getUserId()) as int; 
     setState(() {}); 
   }
 
@@ -61,7 +61,7 @@ class _CurveBarState extends State<CurveBar> {
       detailsanpham(),
       AdminPage(),
       userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')),
-      QuanLyDonHangkh(),
+     // NhanVienListScreen(),
     ];
 
     return Scaffold(

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:pizza_store/admin/editsapham.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/screen/chitietsanpham.dart';
- // Import trang EditProductPage
 
 class ListAd extends StatefulWidget {
   final List list;
@@ -194,7 +193,6 @@ class _ListAdState extends State<ListAd> {
                               onPressed: isOutOfStock
                                   ? null
                                   : () {
-                                      // Chuyển sang trang EditProductPage
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(

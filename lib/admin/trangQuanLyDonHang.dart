@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:pizza_store/admin/trangCTDonHang.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/hoadonModel.dart';
+import 'package:pizza_store/screen/productadd.dart';
 
 class QuanLyDonHang extends StatefulWidget {
   const QuanLyDonHang({super.key});
@@ -27,7 +28,7 @@ class _QuanLyDonHangState extends State<QuanLyDonHang> {
   }
 
   Future<void> fetchOrders() async {
-    final url = Uri.parse('http://172.20.10.9:8000/api/hoadon');
+    final url = Uri.parse('${AppConstants.hoadon}');
     try {
       final response = await http.get(url);
 
@@ -150,14 +151,7 @@ class _QuanLyDonHangState extends State<QuanLyDonHang> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HoaDonDetailPage(
-                              order: order,
-                              onUpdateStatus: (newStatus) {
-                                setState(() {
-                                  order.trang_thai = newStatus;
-                                });
-                              },
-                            ),
+                            builder: (context) => InvoiceDetailScreen(maHoaDon: order.ma_hoa_don)
                           ),
                         );
 

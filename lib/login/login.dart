@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
           final responseData = jsonDecode(response.body);
          
           final String userId = responseData['user']['id'].toString()??"";
-          final String userRole = responseData['user']['quyen']??""; // Lấy quyền người dùng
+          final String userRole = responseData['user']['quyen']??""; 
 
           await AuthService.saveUserId(userId);
           await setLoginStatus(true);
@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> setLoginStatus(bool isLoggedIn) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', isLoggedIn); // Lưu trạng thái đăng nhập
+    await prefs.setBool('isLoggedIn', isLoggedIn); 
   }
 
   @override

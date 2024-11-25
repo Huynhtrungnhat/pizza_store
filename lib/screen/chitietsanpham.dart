@@ -25,7 +25,6 @@
               String maloaigg = "";
 
               void incrementQuantity() {
-                // int stock = widget.product['so_luong_ton_kho'] ?? 0;
                 setState(() {
                   quantity++;
                 });
@@ -365,7 +364,6 @@
                                     ),
                                   ),
                                 ),
-                                // Các lựa chọn đế bánh khác...
                               ],
                             ),
                           ),
