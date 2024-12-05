@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/modelloaigiatri.dart';
 
 class DoiTuongApDung {
@@ -32,7 +33,7 @@ class _AddkhuyenmaiadState extends State<Addkhuyenmaiad> {
   final TextEditingController descriptionController = TextEditingController();
 
   Future<List<LoaiGiaTri>> fetchLoaiGiaTri() async {
-    final response = await http.get(Uri.parse('http://192.168.1.9:8000/api/khuyen_mai/hang-so-cau-hinh'));
+    final response = await http.get(Uri.parse('${AppConstants.BASE_URL}/khuyen_mai/hang-so-cau-hinh'));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body)['loai_gia_tri'];
@@ -43,7 +44,7 @@ class _AddkhuyenmaiadState extends State<Addkhuyenmaiad> {
   }
 
   Future<List<DoiTuongApDung>> fetchDoiTuongApDung() async {
-    final response = await http.get(Uri.parse('http://192.168.1.9:8000/api/khuyen_mai/hang-so-cau-hinh'));
+    final response = await http.get(Uri.parse('${AppConstants.BASE_URL}/khuyen_mai/hang-so-cau-hinh'));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body)['doi_tuong_ap_dung'];

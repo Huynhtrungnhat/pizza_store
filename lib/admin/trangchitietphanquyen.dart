@@ -7,7 +7,7 @@ import 'package:pizza_store/models/usermodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QuanLynahnviendetail extends StatefulWidget {
-  final NhanVien nv; // Nhận đối tượng nhân viên
+  final NhanVien nv; 
   final Function(String) onUpdateStatus;
 
   QuanLynahnviendetail({
@@ -25,13 +25,11 @@ class _QuanLynahnviendetailState extends State<QuanLynahnviendetail> {
   @override
   void initState() {
     super.initState();
-    // Đặt giá trị mặc định cho trạng thái
     _selectedStatus = widget.nv.maNhanVien as String;
   }
 
   Future<void> _updateStatusOnApi(String newStatus) async {
-    // Lấy thông tin userId và gọi API cập nhật trạng thái
-    // (tương tự như trong đoạn code của bạn)
+
   }
 
   @override

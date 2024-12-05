@@ -40,7 +40,7 @@ void _quayveTrangChu() {
               style: 
                 TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 20.0
+                  fontSize: 18.0
               ),
             ),
 

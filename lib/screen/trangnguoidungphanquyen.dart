@@ -18,7 +18,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   final TextEditingController _phoneController = TextEditingController();
   String? _selectedPermission;
 
-  // Danh sách quyền
   final List<String> permissions = ['admin', 'user', 'nv'];
 
   Future<void> _loadUserAddress() async {
@@ -32,7 +31,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
         setState(() {
           _nameController.text = userData['name'] ?? '';
           _phoneController.text = userData['email'] ?? '';
-          _selectedPermission = userData['quyen'] ?? ''; // Giả sử 'quyen' là giá trị quyền
+          _selectedPermission = userData['quyen'] ?? ''; 
         });
       }
     } catch (e) {
@@ -48,7 +47,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
         body: jsonEncode({
           'name': _nameController.text,
           'email': _phoneController.text,
-          'quyen': _selectedPermission, // Sử dụng quyền đã chọn
+          'quyen': _selectedPermission, 
         }),
       );
 

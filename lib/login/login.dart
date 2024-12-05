@@ -47,9 +47,10 @@ class _LoginPageState extends State<LoginPage> {
           final String userRole = responseData['user']['quyen']??""; 
 
           await AuthService.saveUserId(userId);
+           await AuthService.saveUserRole(userRole); 
           await setLoginStatus(true);
 
-          if (userRole == 'admin') {
+          if (userRole == 'admin'||userRole == 'nv') {
            Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(

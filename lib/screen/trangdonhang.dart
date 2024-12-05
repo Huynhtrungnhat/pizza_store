@@ -1,177 +1,208 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
-import 'package:pizza_store/admin/trangCTDonHang.dart';
 import 'package:pizza_store/api/controller.dart';
-import 'package:pizza_store/models/hoadonModel.dart';
-import 'package:pizza_store/screen/chitiethoasdonkh.dart';
+import 'package:pizza_store/login/login.dart';
+import 'package:pizza_store/models/cthoadonModel.dart';
+import 'package:pizza_store/models/khachhnag.dart';
+import 'package:pizza_store/models/modelhoadonkh.dart';
+import 'package:pizza_store/screen/cthoadon.dart';
+import 'package:pizza_store/screen/fechdatakhhpadon.dart';
+import 'package:pizza_store/screen/chitiethoadonme.dart';
+import 'package:pizza_store/screen/productadd.dart';
+import 'package:pizza_store/screen/trangCTHD.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class QuanLyDonHangkh extends StatefulWidget {
-  const QuanLyDonHangkh({super.key});
+class timkhtheohdkhmy extends StatefulWidget {
 
   @override
-  State<QuanLyDonHangkh> createState() => _QuanLyDonHangkhState();
+  _timkhtheohdkhmyState createState() => _timkhtheohdkhmyState();
 }
-
-class _QuanLyDonHangkhState extends State<QuanLyDonHangkh> {
-  List<HoaDon> allOrders = [];
-  List<HoaDon> filteredOrders = [];
-  bool isLoading = true;
-  String selectedStatus = 'Tất cả';
+class _timkhtheohdkhmyState extends State<timkhtheohdkhmy> {
+  late Future<Map<String, dynamic>?> _futureData;
+  String selectedStatus = 'Tất cả'; 
 
   @override
   void initState() {
     super.initState();
-    fetchOrders();
+    _futureData = fetchKhachHangHoaDon();
   }
 
-  Future<void> fetchOrders() async {
-    final url = Uri.parse('http://172.20.10.9:8000/api/hoadon/khach-hang/danh-sach-hoa-don-cho-khach-hang/1');
-    try {
-      final response = await http.get(url);
+Future<Map<String, dynamic>?> fetchKhachHangHoaDon() async {
+  try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
 
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
+    if (userId == null) {
+      return null;
+    }
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> data = json.decode(response.body);
+    final url = Uri.parse('${AppConstants.BASE_URL}/khachhang/khachhanghd/$userId');
+    final response = await http.get(url);
 
-        if (data.containsKey('data')) {
-          final List<dynamic> orderList = data['data'];
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      print('Lỗi: ${response.statusCode}');
+      print('Thông báo lỗi: ${response.body}');
+      return null; 
+    }
+  } catch (e) {
 
-          setState(() {
-            allOrders = orderList.map((json) => HoaDon.fromJson(json)).toList();
-            filterOrders();
-            isLoading = false;
-          });
-        } else {
-          throw Exception('Key "user" not found in response data');
-        }
-      } else {
-        throw Exception('Failed to load orders. Status Code: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error occurred: $e');
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading orders: $e')),
-      );
+    print('Lỗi kết nối: $e');
+    return null; 
+  }
+}
+
+
+
+  List<HoaDon> filterHoaDons(List<HoaDon> hoaDons) {
+    if (selectedStatus == 'Tất cả') {
+      return hoaDons;
+    } else {
+      return hoaDons.where((hoaDon) => hoaDon.trangThai == selectedStatus).toList();
     }
   }
 
-
-  void filterOrders() {
-    setState(() {
-      if (selectedStatus == 'Tất cả') {
-        filteredOrders = allOrders;
-      } else {
-        filteredOrders = allOrders.where((order) => order.trang_thai == selectedStatus).toList();
-      }
-    });
-  }
-
-  Widget buildFilterButtons() {
-    const statuses = ['Tất cả', 'Chờ xác nhận', 'Đang vận chuyển', 'Hoàn thành', 'Đã hủy'];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal, 
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: statuses.map((status) {
-          return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: selectedStatus == status ? Colors.orange : Colors.white,
-              foregroundColor: selectedStatus == status ? Colors.white : Colors.orange,
-              side: BorderSide(color: Colors.orange, width: 2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            onPressed: () {
-              setState(() {
-                selectedStatus = status;
-                filterOrders();
-              });
-            },
-            child: Text(status),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Đơn Hàng Của Tôi'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: buildFilterButtons(),
-          ),
-          Expanded(
-            child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : ListView.builder(
-                itemCount: filteredOrders.length,
-                itemBuilder: (context, index) {
-                  final order = filteredOrders[index];
-                  final formattedDate = order.ngay_lap_hd != null
-                      ? DateFormat('dd/MM/yyyy').format(DateTime.parse(order.ngay_lap_hd!))
-                      : 'N/A';
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Thông tin chi tiết các đơn hàng'),
+      centerTitle: true,
+      backgroundColor: Colors.green,
+    ),
+    body: FutureBuilder<Map<String, dynamic>?>(
+      future: _futureData,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Lỗi: ${snapshot.error}'));
+        } else if (snapshot.data == null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Bạn chưa đăng nhập! nên chưa thể xem',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()), 
+              );
+                  },
+                  child: Text('Đăng nhập'),
+                ),
+              ],
+            ),
+          );
+        }
 
-                  final double tongTienDouble = double.tryParse(order.tong_tien.toString()) ?? 0.0;
-                  final formattedTien = tongTienDouble.toStringAsFixed(2);
+        final khachHang = KhachHang.fromJson(snapshot.data!['khachhang']);
+        final hoaDons = (snapshot.data!['hoa_dons'] as List)
+            .map((json) => HoaDon.fromJson(json))
+            .toList();
+
+        final filteredHoaDons = filterHoaDons(hoaDons);
+
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'các đơn hàng đã mua:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedStatus = 'Tất cả';
+                          });
+                        },
+                        child: Text('Tất cả'),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedStatus = 'Chờ xác nhận';
+                          });
+                        },
+                        child: Text('Chờ xác nhận'),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedStatus = 'Hoàn thành';
+                          });
+                        },
+                        child: Text('Đã hoàn thành'),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedStatus = 'Đã hủy';
+                          });
+                        },
+                        child: Text('Đã hủy'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: filteredHoaDons.length,
+                itemBuilder: (context, index) {
+                  final hoaDon = filteredHoaDons[index];
 
                   return Card(
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.orange,
-                        child: Text(order.ma_hoa_don.toString()),
-                      ),
-                      title: Text(formattedDate),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Tổng tiền: ${formattedTien} đ'),
-                          Text('Trạng thái: ${order.trang_thai}'),
-                        ],
-                      ),
-                      trailing: Icon(Icons.chevron_right),
-                      onTap: () async {
-                        final result = await Navigator.push(
+                      title: Text('Mã hóa đơn: ${hoaDon.maHoaDon}'),
+                      subtitle: Text('Ngày lập: ${hoaDon.ngayLapHd ?? 'Chưa có'}\n'
+                          'Tổng tiền: ${hoaDon.tongTien}đ\n'
+                          'Trạng thái: ${hoaDon.trangThai ?? 'Chưa xác định'}'),
+                      onTap: () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => HoaDonDetailPageKh(
-                              order: order,
-                              onUpdateStatus: (newStatus) {
-                                setState(() {
-                                });
-                              },
+                            builder: (context) => InvoiceDetailScreen(
+                              maHoaDon: hoaDon.maHoaDon,
+                              makh: khachHang.maKhachHang,
                             ),
                           ),
                         );
-
-                        if (result == true) {
-                          fetchOrders();
-                        }
                       },
                     ),
                   );
                 },
               ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        );
+      },
+    ),
+  );
+}
+
 }

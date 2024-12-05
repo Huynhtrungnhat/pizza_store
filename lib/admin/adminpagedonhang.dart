@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/admin/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/timdoacokhachahng.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkhtheohoadon.dart';
+
 
 import 'package:pizza_store/admin/trangQuanLyDonHang.dart';
 
@@ -26,7 +28,7 @@ class Adminpagedonhang extends StatelessWidget {
               context,
               'Tìm khách hàng theo đơn hàng',
               Icons.shopping_bag,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) => timkhtheohd(maKhachHang: 1,)),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) => Timhoadonchokh()),
               ),
               ),
            

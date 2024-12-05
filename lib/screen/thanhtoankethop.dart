@@ -5,11 +5,12 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
+import 'package:pizza_store/screen/suaDiaChiNhanHang.dart';
 import 'package:pizza_store/screen/trangTTThanhCong.dart';
 import 'package:pizza_store/screen/trangThanhToan.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'dart:io' show Platform;
+
 
 class TrangThanhToanKetHop extends StatefulWidget {
   @override
@@ -24,8 +25,11 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
   String promoMessage = '';
   TextEditingController mkmController = TextEditingController();
   bool isProcessingPayment = false;
-   String selectedPaymentMethod = 'COD'; // Phương thức mặc định
+   String selectedPaymentMethod = 'COD'; 
   final List<String> paymentMethods = ['COD', 'VNPay'];
+  int makmai=0;
+  int soluong=0; 
+  bool kiemtrakhuyenmai=false;
 
   late final WebViewController _webViewController;
 
@@ -33,18 +37,7 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
   void initState() {
     super.initState();
     fetchUserData();
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageFinished: (String url) {
-            setState(() => isProcessingPayment = false);
-            if (url.contains('vnpay_return')) {
-              _checkPaymentStatus(url);
-            }
-          },
-        ),
-      );
+    
   }
 
   Future<void> fetchUserData() async {
@@ -63,39 +56,47 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
 
     setState(() => isLoading = false);
   }
-  Future<void> checkPromoCode(String code) async {
+Future<void> checkPromoCode(String code) async {
   try {
     final response = await http.get(Uri.parse(
-        'http://172.20.10.9:8000/api/khuyen_mai/danh-sach-khuyen-mai/hoa-don'));
+        '${AppConstants.BASE_URL}/khuyen_mai/danh-sach-khuyen-mai/hoa-don'));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final promotions = data['data'] as List<dynamic>;
 
-      // Kiểm tra mã nhập vào
       final promo = promotions.firstWhere(
         (item) => item['ten_khuyen_mai'] == code && item['trang_thai'] == 1,
         orElse: () => null,
       );
 
       if (promo != null) {
-        // Lấy ngày áp dụng và hết hạn
+        makmai=promo['ma_khuyen_mai'];
         String apDungTuNgay = promo['ap_dung_tu_ngay'];
         String apDungDenNgay = promo['ap_dung_den_ngay'];
+        int giaTriKhuyenMai = promo['gia_tri_khuyen_mai'];
+        soluong=promo['gia_tri_khuyen_mai'];
 
-        // Chuyển đổi ngày thành đối tượng DateTime
+    
+        if (giaTriKhuyenMai == 0) {
+          setState(() {
+            discount = 0.0;
+            promoMessage = "Voucher đã hết hạn hoặc không còn giá trị!";
+          });
+          return;
+        }
+
         DateTime startDate = DateTime.parse(apDungTuNgay);
         DateTime endDate = DateTime.parse(apDungDenNgay);
         DateTime currentDate = DateTime.now();
 
-        // Kiểm tra ngày hiện tại có nằm trong khoảng ngày áp dụng hay không
         if (currentDate.isAfter(startDate) && currentDate.isBefore(endDate)) {
-          // Tách giá trị giảm giá từ mã
           final discountMatch = RegExp(r'\d+').firstMatch(code);
           if (discountMatch != null) {
             final discountValue = int.parse(discountMatch.group(0)!);
-
+              kiemtrakhuyenmai=true;
             setState(() {
-              discount = discountValue.toDouble(); // Gán giá trị giảm giá
+              discount = discountValue.toDouble();
+              
               promoMessage =
                   "Mã hợp lệ: Giảm ${discountValue}K. Tổng mới: ${NumberFormat("#,##0", "vi_VN").format(getTotalAfterDiscount())} VND";
             });
@@ -124,21 +125,23 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
     }
   } catch (e) {
     setState(() {
-      promoMessage = "Có lỗi xảy ra: $e";
+      promoMessage = "Có lỗi xảy raffff: $e";
     });
   }
 }
 
 
+
   double getTotalAfterDiscount() {
     double totalPrice = cart.getTotalPrice();
-    double discountAmount = discount; // Giảm giá trực tiếp (theo K)
+    double discountAmount = discount; 
     return totalPrice - discountAmount;
   }
    Widget dashedDivider({
     double dashWidth = 5,
     double dashHeight = 2,
-    List<Color> colors = const [Colors.grey, Colors.blue], // Màu xen kẽ
+    List<Color> colors = const [Colors.grey, Colors.blue], 
+
     double indent = 20,
     double endIndent = 20,
     double spaceBetweenDashes = 3,
@@ -156,7 +159,7 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
               return Container(
                 width: dashWidth,
                 height: dashHeight,
-                color: colors[index % colors.length], // Xen kẽ màu
+                color: colors[index % colors.length], 
               );
             }),
           );
@@ -165,69 +168,47 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
     );
   }
 
-  Future<void> addHoaDon(String tong_tien, int ma_khach_hang,int manv) async {
+  Future<void> addHoaDon(String tong_tien, int ma_khach_hang,String today,int manv,String phuongthuctt,String trangthai) async {
     final url = Uri.parse('${AppConstants.hoadon}');
     await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
+      
       body: jsonEncode({
         'tong_tien': tong_tien, 
         'ma_khach_hang': ma_khach_hang,
-        'ma_nhan_vein': manv
-        
+        "ngay_lap_hd":today,
+        'ma_nhan_vien': manv,
+        'pttt':phuongthuctt,
+        'trang_Thai':trangthai,
+        'san_pham': cart.items
         }),
     );
+
   }
+   Future<void> updatePromoCode(int promoId) async {
 
-  Future<void> initializeVNPayPayment(double amount) async {
-    setState(() => isProcessingPayment = true);
-    final response = await http.post(
-      Uri.parse('http://192.168.1.20:8000/api/vnpay_payment'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'amount': amount, 'bank_code': 'VNBANK', 'language': 'vn'}),
-    );
+        final int soluongmoi=soluong-1;
+        final updateResponse = await http.put(
+          Uri.parse('${AppConstants.BASE_URL}/khuyen_mai/$promoId'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode({
+            'gia_tri_khuyen_mai': soluongmoi,
+          }),
+        );
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      String paymentUrl = responseData['data'];
-      if (paymentUrl.isNotEmpty) {
-        _webViewController.loadRequest(Uri.parse(paymentUrl));
-      } else {
-        _showError('VNPay URL trống.');
-      }
-    } else {
-      _showError('Lỗi khởi tạo thanh toán VNPay.');
+        if (updateResponse.statusCode == 200) {
+          setState(() {
+            promoMessage = "Cập nhật khuyến mãi thành công!";
+          });
+        } else {
+          setState(() {
+            promoMessage = "Lỗi khi cập nhật khuyến mãi!";
+          });
+        }
     }
-  }
-
-  void _checkPaymentStatus(String url) {
-    final uri = Uri.parse(url);
-    final responseCode = uri.queryParameters['vnp_ResponseCode'];
-
-    if (responseCode == '00') {
-      _handlePaymentSuccess();
-    } else {
-      _handlePaymentFailure(responseCode ?? 'unknown');
-    }
-  }
-
-  void _handlePaymentSuccess() {
-    final tongTien = getTotalAfterDiscount().toStringAsFixed(2);
-    final maKh = userData?['ma_khach_hang'];
-
-    addHoaDon(tongTien, maKh!,0);
-    cart.clear();
-    _showSuccessDialog();
-  }
-
-  void _handlePaymentFailure(String errorCode) {
-    _showFailureDialog(errorCode);
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red));
-  }
-
   void _showSuccessDialog() {
     showDialog(
       context: context,
@@ -307,8 +288,19 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
                       color: Colors.red),
                   textAlign: TextAlign.left,
                 ),
-                SizedBox(width: 150),
-                Icon(Icons.edit),
+                SizedBox(width: 100),
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              color: Colors.blueAccent,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SuaDiaChi(),
+                                  ),
+                                );
+                              },
+                            ),
               ],
             ),
             SizedBox(height: 2),
@@ -322,7 +314,7 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
               'Địa Chỉ: ${userData?['diachi'] ?? 'N/A'} ',
             ),
             dashedDivider(
-              colors: [Colors.red, Colors.green], // Màu sắc xen kẽ
+              colors: [Colors.red, Colors.green], 
               dashWidth: 10,
               dashHeight: 3,
               indent: 1,
@@ -379,7 +371,7 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
             SizedBox(height: 8),
             ElevatedButton(
               onPressed: () {
-                checkPromoCode(mkmController.text.trim());
+                checkPromoCode(mkmController.text.trim().toUpperCase());
               },
               child: Text('Áp dụng mã'),
             ),
@@ -427,9 +419,17 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
                   ElevatedButton(
                     onPressed: () {
                         if (selectedPaymentMethod == 'COD') {
-                          final tongTien = getTotalAfterDiscount().toStringAsFixed(2);
+                          final tongTien = getTotalAfterDiscount().toStringAsFixed(3);
+                          var tien=tongTien*10;
                          final maKh = userData?['ma_khach_hang'];
-                  addHoaDon(tongTien, maKh!,10);
+                         final pttt=selectedPaymentMethod.toString();
+                         final trangthai="Chờ xác nhận";
+                       String today = '${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}';
+                  addHoaDon(tien, maKh!,today,10,pttt,trangthai);
+                              if (kiemtrakhuyenmai) {
+                updatePromoCode(makmai);
+              }
+
                   cart.clear();
                   Navigator.pop(context);
                   Navigator.push(
@@ -438,29 +438,24 @@ class _TrangThanhToanKetHopState extends State<TrangThanhToanKetHop> {
                       builder: (context) => ThanhToanThanhCong(),
                     ),
                   );
-                        //_handlePaymentSuccess();
-                        
-                         // Thanh toán COD
                       } else if (selectedPaymentMethod == 'VNPay') {
                          final tongTienthanhtoan = getTotalAfterDiscount().toInt().toDouble();
                          var tien=tongTienthanhtoan*1000;
+                         final makh=userData?['ma_khach_hang'];
+                          final pttt=selectedPaymentMethod.toString();
+                             if (kiemtrakhuyenmai) {
+                updatePromoCode(makmai);
+              }
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>  MobilePaymentScreen(amount: tien,onPaymentFailure: ()=>{},onPaymentSuccess: ()=>{
+                              builder: (context) =>  MobilePaymentScreen(makh:makh ,pttt:pttt ,amount: tien,onPaymentFailure: ()=>{},onPaymentSuccess: ()=>{
                               },saveData: ()=>{
                                 
                               },)
                             ),
                           );
                          
-                  // Navigator.pop(context);
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => ThanhToanThanhCong(),
-                  //   ),
-                  // );
                       }
                     },
                     style: ElevatedButton.styleFrom(

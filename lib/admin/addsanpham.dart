@@ -4,8 +4,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
+import 'package:pizza_store/screen/tranggiohang.dart';
 
 class ProductInputPage extends StatefulWidget {
   @override
@@ -84,6 +86,8 @@ class _ProductInputPageState extends State<ProductInputPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Nhập thông tin sản phẩm'),
+        centerTitle: true,
+        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -105,7 +109,7 @@ class _ProductInputPageState extends State<ProductInputPage> {
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Chọn hình ảnh'),
+                child: Text('Chọn hình ảnh cần thêm'),
               ),
               SizedBox(height: 20),
               TextField(
@@ -129,7 +133,7 @@ class _ProductInputPageState extends State<ProductInputPage> {
               SizedBox(height: 10),
            
               SizedBox(height: 10),
-              // DropdownMenu cho loại khuyến mãi
+              
               DropdownButtonFormField<String>(
                 value: _chonMALoai,
                 onChanged: (String? newValue) {
@@ -261,14 +265,8 @@ class _ProductInputPageState extends State<ProductInputPage> {
                     base64Image = 'data:image/jpeg;base64,' +
                         await _convertImageToBase64(_selectedImage!);
                   }
-                  ThemSanPham(productName, description, price, Maloai,promotionType, promotionValue, base64Image);
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CurveBar(),
-                    ),
-                    (route) => false,
-                  );
+                 await ThemSanPham(productName, description, price, Maloai,promotionType, promotionValue, base64Image);
+                  Navigator.pop(context,true);
 
                   // print('Tên sản phẩm: $productName');
                   // print('Mô tả: $description');
@@ -285,7 +283,7 @@ class _ProductInputPageState extends State<ProductInputPage> {
                     print('Chưa chọn hình ảnh');
                   }
                 },
-                child: Text('Lưu sản phẩm'),
+                child: Text( '            Thêm sản phẩm mới          '),
               ),
               SizedBox(height: 100),
             ],

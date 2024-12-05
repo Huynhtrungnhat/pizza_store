@@ -1,4 +1,5 @@
 import 'dart:convert';
+// import 'dart:ffi';
 
 import 'package:pizza_store/models/sanphammodel.dart';
 import 'package:pizza_store/statusgiohang/loadsave.dart';
@@ -9,7 +10,8 @@ class Cart {
   List<Product> items = [];
 
   void addsanpham(Product product) {
-    int index = items.indexWhere((item) => item.ten_san_pham == product.ten_san_pham);
+    int index =
+        items.indexWhere((item) => item.ten_san_pham == product.ten_san_pham);
 
     if (index != -1) {
       items[index].so_luong_ton_kho += product.so_luong_ton_kho;
@@ -19,10 +21,10 @@ class Cart {
   }
 
   void updateQuantity(Product product, int newQuantity) {
-    int index = items.indexWhere((item) => item.ten_san_pham == product.ten_san_pham);
+    int index =
+        items.indexWhere((item) => item.ten_san_pham == product.ten_san_pham);
     if (index != -1) {
       if (newQuantity > 0) {
-       
         items[index].so_luong_ton_kho = newQuantity;
         saveCartToSharedPreferences(cart.items);
       } else {
@@ -62,20 +64,20 @@ class Cart {
   }
 
   Future<void> loadCartFromSharedPreferences() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String>? cartList = prefs.getStringList('cart');
- // print('Dữ liệu giỏ hàng từ SharedPreferences: $cartList'); 
-
-  if (cartList != null && cartList.isNotEmpty) {
-    items = cartList.map((item) => Product.fromJson(json.decode(item))).toList();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String>? cartList = prefs.getStringList('cart');
+    if (cartList != null && cartList.isNotEmpty) {
+      items = cartList.map((item) => Product.fromJson(json.decode(item))).toList();
+    }
   }
-}
-
-
 
   void clear() {
     items.clear();
-    saveCartToSharedPreferences(items); 
+    saveCartToSharedPreferences(items);
+  }
+  
+  List<Product> getItems() {
+    return cart.items.toList();
   }
 }
 

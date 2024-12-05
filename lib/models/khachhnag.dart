@@ -28,4 +28,5 @@ class KhachHang {
       updatedAt: DateTime.parse(json['updated_at']),
     );
   }
+  
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/admin/timkhtheohoadon.dart';
-import 'package:pizza_store/admin/timkiemtheosdtupdate.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/pagegg.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkiemtheosdtupdate.dart';
 
 class adminpagkhachhang extends StatelessWidget {
   @override
@@ -8,7 +9,8 @@ class adminpagkhachhang extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Trang Quản Lý Khách hàng'),
-        centerTitle: true,
+         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -31,7 +33,7 @@ class adminpagkhachhang extends StatelessWidget {
               context,
               'Hiển thị chi tiết thông tin của khách hàng (bao gồm các đơn hàng, lịch sử giao dịch).',
               Icons.people,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) => timkhtheohd(maKhachHang: 1,)),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) => timkhcohd()),
               ),
             ),
           ],

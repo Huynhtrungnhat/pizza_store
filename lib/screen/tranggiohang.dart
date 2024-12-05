@@ -1,11 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
 import 'package:pizza_store/navigationbottom/home_navigationbar.dart';
 import 'package:pizza_store/screen/thanhtoankethop.dart';
-import 'package:pizza_store/screen/trangCTHD.dart';
-import 'package:pizza_store/screen/trangThanhToan.dart';
+
 
 
 class CartPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class _CartPageState extends State<CartPage> {
   double _rotation = 0.0;
   double _fontSize = 12.0;
   Color _textColor = Colors.black;
+  List products = [];
 
   double getTotalAfterDiscount() {
     double totalPrice = cart.getTotalPrice();
@@ -29,6 +31,8 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     super.initState();
     loadCart();
+    products = cart.getItems();
+
   }
 
   Future<void> loadCart() async {
@@ -80,7 +84,7 @@ class _CartPageState extends State<CartPage> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  SizedBox(height: 10), // Thêm khoảng cách
+                  SizedBox(height: 10), 
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushAndRemoveUntil(
@@ -128,10 +132,9 @@ class _CartPageState extends State<CartPage> {
               
             ),
             
-            
           ],
           Row(
-                    mainAxisSize: MainAxisSize.min,
+                   mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         icon: Icon(Icons.remove),
@@ -143,6 +146,7 @@ class _CartPageState extends State<CartPage> {
                         },
                       ),
                       Text('${item.so_luong_ton_kho}'),
+                    
                       IconButton(
                         icon: Icon(Icons.add),
                         onPressed: () {

@@ -10,6 +10,8 @@ import 'dart:io' show Platform;
 
 class MobilePaymentScreen extends StatefulWidget {
   final double amount;
+  final int makh;
+  final String pttt;
   final Function() onPaymentSuccess;
   final Function() onPaymentFailure;
   final Function() saveData;
@@ -17,6 +19,8 @@ class MobilePaymentScreen extends StatefulWidget {
   const MobilePaymentScreen({
     Key? key,
     required this.amount,
+    required this.makh,
+    required this.pttt,
     required this.onPaymentSuccess,
     required this.onPaymentFailure,
     required this.saveData,
@@ -65,6 +69,22 @@ class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
       isLoading = false;
     });
   }
+  Future<void> addHoaDon(String tong_tien, int ma_khach_hang,String today,int manv,String phuongthuctt) async {
+    final url = Uri.parse('${AppConstants.hoadon}');
+    await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'tong_tien': tong_tien, 
+        'ma_khach_hang': ma_khach_hang,
+        "ngay_lap_hd":tong_tien,
+        'ma_nhan_vien': manv,
+        'pttt':phuongthuctt,
+        'trang_Thai':"Chờ xác nhận",
+        'san_pham': cart.items
+        }),
+    );
+  }
 
   double discount = 0.0;
 
@@ -106,7 +126,7 @@ class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
   Future<void> _initializePayment() async {
     try {
       final response = await http.post(
-        Uri.parse('http://172.20.10.9:8000/api/vnpay_payment'), // Cập nhật URL chính xác
+        Uri.parse('${AppConstants.BASE_URL}/vnpay_payment'), 
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'amount': widget.amount,
@@ -189,9 +209,11 @@ class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
             TextButton(
               child: Text('đóng'),
               onPressed: () {
-                // final tongTien = getTotalAfterDiscount().toStringAsFixed(2);
-                //   final maKh = userData?['ma_khach_hang'];
-                //   addHoaDon(tongTien, maKh!);
+                 final tongTien =widget.amount.toString();
+                   final maKh = widget.makh;
+                   final pttt=widget.pttt;
+                   String today = '${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}';
+                addHoaDon(tongTien , maKh,today, 10, pttt);
                   cart.clear();
                   Navigator.pop(context);
                   Navigator.push(
@@ -230,15 +252,15 @@ class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
           TextButton(
             child: Text('Try Again'),
             onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              _initializePayment(); // Restart payment process
+              Navigator.of(context).pop(); 
+              _initializePayment(); 
             },
           ),
           TextButton(
             child: Text('Cancel'),
             onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              Navigator.of(context).pop(); // Return to previous screen
+              Navigator.of(context).pop(); 
+              Navigator.of(context).pop(); 
             },
           ),
         ],
@@ -260,19 +282,7 @@ class _MobilePaymentScreenState extends State<MobilePaymentScreen> {
       ),
     );
   }
-   Future<void> addHoaDon(String tong_tien, int ma_khach_hang) async {
-    final url = Uri.parse('${AppConstants.BASE_URL}/hoadon');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'tong_tien': tong_tien,
-        'ma_khach_hang': ma_khach_hang,
-      }),
-    );
-  }
+
 
   String _getErrorMessage(String errorCode) {
     switch (errorCode) {

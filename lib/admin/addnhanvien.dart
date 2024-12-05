@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_store/api/controller.dart';
@@ -17,28 +16,61 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
   TextEditingController _ngaySinhController = TextEditingController();
   TextEditingController _trangThaiController = TextEditingController();
 
-  int _gioiTinh = 1; // 1 cho Nam, 2 cho Nữ, v.v.
+  int _gioiTinh = 1;
   String? sizepiza;
+  String? _emailError;  
 
-  // Thêm nhân viên qua API
-  Future<void> Themnhanvien( String ten_san_pham,int ma_loai_nhan_vien,int gioi_tinh,String ngay_sinh,String dia_chi,String email,String sdt,String trang_thai) async {
-    final url = Uri.parse('${AppConstants.nhanvien}');
+
+  Future<bool> kiemTraEmailTonTai(String email) async {
+    final url = Uri.parse('${AppConstants.User_all}/check-email'); 
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email': email,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['exists']; 
+    } else {
+      throw Exception('Lỗi khi kiểm tra email');
+    }
+  }
+
+  Future<void> Themnhanvien(String ten_san_pham, int ma_loai_nhan_vien, int gioi_tinh, String ngay_sinh, String dia_chi, String email, String sdt, String trang_thai) async {
     try {
+
+      bool emailTonTai = await kiemTraEmailTonTai(email);
+      if (emailTonTai) {
+        setState(() {
+          _emailError = 'Email đã tồn tại, vui lòng nhập email khác!';
+        });
+        return; 
+      } else {
+        setState(() {
+          _emailError = null;  
+        });
+      }
+
+      final url = Uri.parse('${AppConstants.nhanvien}');
       final response = await http.post(
         url,
         headers: {
-          'Content-Type': 'appliaction/json',
+          'Content-Type': 'application/json',
         },
         body: jsonEncode({
-            'ten_nhan_vien': ten_san_pham,
-            'ma_loai_nhan_vien': ma_loai_nhan_vien, 
-            'gioi_tinh': gioi_tinh,
-            'ngay_sinh': ngay_sinh,
-            'dia_chi': dia_chi,
-            'email': email,
-            'sdt': sdt,
-            'trang_thai': trang_thai,
-          
+          'ten_nhan_vien': ten_san_pham,
+          'ma_loai_nhan_vien': ma_loai_nhan_vien,
+          'gioi_tinh': gioi_tinh,
+          'ngay_sinh': ngay_sinh,
+          'dia_chi': dia_chi,
+          'email': email,
+          'sdt': sdt,
+          'trang_thai': "1",
         }),
       );
 
@@ -53,10 +85,11 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
       print('Lỗi khi thực hiện yêu cầu: $error');
     }
   }
-  Future<void> addUser(String name, String email, String password,String quyen) async {
+
+  Future<void> addUser(String name, String email, String password, String quyen) async {
     final url = Uri.parse('${AppConstants.BASE_URL}/register');
     final response = await http.post(
-      url, 
+      url,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -64,12 +97,11 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
         'name': name,
         'email': email,
         'password': password,
-        'quyen':quyen,
+        'quyen': quyen,
       }),
     );
   }
 
-  // Chọn ngày sinh
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -80,7 +112,7 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
 
     if (pickedDate != null && pickedDate != DateTime.now()) {
       setState(() {
-        _ngaySinhController.text = '${pickedDate.toLocal()}'.split(' ')[0]; // Chỉ lấy ngày tháng năm
+        _ngaySinhController.text = '${pickedDate.toLocal()}'.split(' ')[0]; 
       });
     }
   }
@@ -90,43 +122,52 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Thêm Nhân Viên'),
+         centerTitle: true,
+        backgroundColor: Colors.green,
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: Icon(Icons.save,color: Colors.amber,),
             onPressed: () async {
-    final ten_nhan_vien = _tenNhanVienController.text;
-    final ma_loai_nhan_vien = 1; 
-    final gioi_tinh = _gioiTinh; 
-    final ngay_sinh = _ngaySinhController.text; 
-    final dia_chi = _diaChiController.text;
-    final email = _emailController.text;
-    final trang_thai = _trangThaiController.text;
-    final sdt = _sdtController.text;
-    final pass="pizadnd@123";
-    final quyen="null";
+              final ten_nhan_vien = _tenNhanVienController.text;
+              final ma_loai_nhan_vien = 1; 
+              final gioi_tinh = _gioiTinh; 
+              final ngay_sinh = _ngaySinhController.text; 
+              final dia_chi = _diaChiController.text;
+              final email = _emailController.text;
+              final trang_thai = _trangThaiController.text;
+              final sdt = _sdtController.text;
+              final pass = "pizadnd@123";
+              final quyen = "null";
 
-        print('Tên: $ten_nhan_vien');
-        print('Mã loại: $ma_loai_nhan_vien');
-        print('Giới tính: $gioi_tinh');
-        print('Ngày sinh: $ngay_sinh');
-        print('Địa chỉ: $dia_chi');
-        print('Email: $email');
-        print('Trạng thái: $trang_thai');
-        print('Số điện thoại: $sdt');
-
- 
-    if (ten_nhan_vien.isNotEmpty && ngay_sinh.isNotEmpty) {
-     
-      await Themnhanvien(ten_nhan_vien, ma_loai_nhan_vien, gioi_tinh, ngay_sinh, dia_chi, email, sdt, trang_thai);
-      addUser(ten_nhan_vien, email, pass,quyen);
-      Navigator.pop(context);
+              print('Tên: $ten_nhan_vien');
+              print('Mã loại: $ma_loai_nhan_vien');
+              print('Giới tính: $gioi_tinh');
+              print('Ngày sinh: $ngay_sinh');
+              print('Địa chỉ: $dia_chi');
+              print('Email: $email');
+              print('Trạng thái: $trang_thai');
+              print('Số điện thoại: $sdt');
+              bool emailTonTai = await kiemTraEmailTonTai(email);
+    if (emailTonTai) {
+      setState(() {
+        _emailError = 'Email đã tồn tại, vui lòng nhập email khác!';
+      });
+      return;
     } else {
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin!')),
-      );
+      setState(() {
+        _emailError = null;  
+      });
     }
-              }  
+              if (ten_nhan_vien.isNotEmpty && ngay_sinh.isNotEmpty) {
+                await Themnhanvien(ten_nhan_vien, ma_loai_nhan_vien, gioi_tinh, ngay_sinh, dia_chi, email, sdt, trang_thai);
+                addUser(ten_nhan_vien, email, pass, quyen);
+                Navigator.pop(context);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin!')),
+                );
+              }
+            },
           ),
         ],
       ),
@@ -190,7 +231,10 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
               Text('Email:'),
               TextField(
                 controller: _emailController,
-                decoration: InputDecoration(hintText: 'Nhập email'),
+                decoration: InputDecoration(
+                  hintText: 'Nhập email',
+                  errorText: _emailError,  
+                ),
               ),
               SizedBox(height: 10),
               Text('Số Điện Thoại:'),
@@ -199,12 +243,6 @@ class _ThemNhanVienPageState extends State<ThemNhanVienPage> {
                 decoration: InputDecoration(hintText: 'Nhập số điện thoại'),
               ),
               SizedBox(height: 10),
-              Text('Trạng Thái:'),
-              TextField(
-                controller: _trangThaiController,
-                decoration: InputDecoration(hintText: 'Nhập trạng thái'),
-              ),
-              SizedBox(height: 20),
             ],
           ),
         ),

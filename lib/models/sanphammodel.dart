@@ -6,8 +6,8 @@ class Product {
   int so_luong_ton_kho;
   int ma_san_pham; 
  int ma_loai;
-  final String selectedSize; // Kích cỡ
-  final String selectedebanh; // Đế bánh
+  final String selectedSize; 
+  final String selectedebanh; 
 
   Product({
     required this.hinh_anh,
@@ -30,8 +30,8 @@ class Product {
       'hinh_anh': hinh_anh,
       'mo_ta': mo_ta,
       'ma_loai':ma_loai,
-      'selectedSize': selectedSize,  // Thêm selectedSize vào map
-      'selectedebanh': selectedebanh, // Thêm selectedebanh vào map
+      'selectedSize': selectedSize,  
+      'selectedebanh': selectedebanh, 
     };
   }
 
@@ -44,8 +44,39 @@ class Product {
       hinh_anh: json['hinh_anh'],
       mo_ta: json['mo_ta'],
       ma_loai: int.tryParse(json['ma_loai'].toString()) ?? 0,
-      selectedSize: json['selectedSize'] ?? 'Cỡ 9 inch',  // Thêm selectedSize vào từ JSON
-      selectedebanh: json['selectedebanh'] ?? 'Đế dày bột tươi',  // Thêm selectedebanh vào từ JSON
+      selectedSize: json['selectedSize'] ?? 'Cỡ 9 inch', 
+      selectedebanh: json['selectedebanh'] ?? 'Đế dày bột tươi',
+    );
+  }
+}
+class Productct {
+  final int maSanPham;
+  final String tenSanPham;
+  final String moTa;
+  final String gia;
+  final String hinhAnh;
+  final String? loaiKhuyenMai;
+  final String? giaTriKhuyenMai;
+
+  Productct({
+    required this.maSanPham,
+    required this.tenSanPham,
+    required this.moTa,
+    required this.gia,
+    required this.hinhAnh,
+    this.loaiKhuyenMai,
+    this.giaTriKhuyenMai,
+  });
+
+  factory Productct.fromJson(Map<String, dynamic> json) {
+    return Productct(
+      maSanPham: json['ma_san_pham'],
+      tenSanPham: json['ten_san_pham'],
+      moTa: json['mo_ta'],
+      gia: json['gia'],
+      hinhAnh: json['hinh_anh'],
+      loaiKhuyenMai: json['loai_khuyen_mai'],
+      giaTriKhuyenMai: json['gia_tri_khuyen_mai'],
     );
   }
 }

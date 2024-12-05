@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pizza_store/api/controller.dart';
+import 'package:pizza_store/login/login.dart';
+import 'package:pizza_store/screen/trangsuathongtin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -25,7 +27,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     if (userId != null) {
       try {
-        final response = await http.get(Uri.parse('${AppConstants.User_all}/$userId'));
+        final response =
+            await http.get(Uri.parse('${AppConstants.User_all}/$userId'));
 
         if (response.statusCode == 201) {
           setState(() {
@@ -34,7 +37,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           });
         } else {
           setState(() {
-            errorMessage = 'Không thể tải thông tin người dùng. Mã trạng thái: ${response.statusCode}';
+            errorMessage =
+                'Không thể tải thông tin người dùng. Mã trạng thái: ${response.statusCode}';
           });
         }
       } catch (e) {
@@ -54,21 +58,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   Future<void> clearUserId() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.remove('userId'); // Xóa ID người dùng
-  await prefs.remove('isLoggedIn'); // Xóa trạng thái đăng nhập
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userId');
+    await prefs.remove('isLoggedIn');
+    await prefs.remove('userRole'); 
 
-  setState(() {
-    userId = null;
-    userData = null;
-    errorMessage = 'ID người dùng đã bị xóa!';
-    isLoading = false; // Đặt lại trạng thái tải lại dữ liệu
-  });
+    setState(() {
+      userId = null;
+      userData = null;
+      errorMessage = 'Bạn đã đăng xuất';
+      isLoading = false;
+    });
 
-  // Gọi lại phương thức fetchUserData để tải lại dữ liệu
-  fetchUserData();
-}
-
+    fetchUserData();
+     Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginPage()),
+  );
+  }
 
   @override
   void initState() {
@@ -80,15 +87,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thông tin cá nhân'),
+        title: Text('Thông tin Tài Khoản'),
         centerTitle: true,
       ),
-      body: isLoading 
+      body: isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(16.0),
-              child: errorMessage != null 
-                  ? Center(child: Text(errorMessage!, style: TextStyle(color: Colors.red, fontSize: 16)))
+              child: errorMessage != null
+                  ? Center(
+                      child: Text(errorMessage!,
+                          style: TextStyle(color: Colors.red, fontSize: 16)))
                   : ListView(
                       children: [
                         Container(
@@ -106,28 +115,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               alignment: Alignment.center,
                               child: CircleAvatar(
                                 radius: 80,
-                                // backgroundImage: NetworkImage(
-                                //   userData?['avatar_url'] ?? 'https://www.example.com/avatar.jpg',
-                                // ),
+                                backgroundImage:
+                                    AssetImage('assets/images/anhdaidien.jpg'),
                               ),
                             ),
                           ),
                         ),
                         Divider(),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         _buildDetailCard('Tên', userData?['name']),
-                         Divider(),
-                        _buildDetailCard('Email', userData?['email']),
-                         Divider(),
-                        _buildDetailCard('Ngày tạo', userData?['created_at']?.toString()),
                         Divider(),
+                        _buildDetailCard('Email', userData?['email']),
+                        _buildAdminOption(
+                          context,
+                          'Cập nhật thông tin',
+                          Icons.exit_to_app,
+                          () async {
+                            final updatedName = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditNamePage(
+                                  currentName: userData?['name'] ?? '',
+                                  email: userData?['email'] ?? '',
+                                ),
+                              ),
+                            );
+                            if (updatedName != null) {
+                              setState(() {
+                                userData?['name'] = updatedName;
+                              });
+                            }
+                          },
+                        ),
                         SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed:(){
-                            clearUserId();
-
-                          } ,
-                          child: Text('đăng xuất'),
+                        _buildAdminOption(
+                          context,
+                          'Đăng xuất',
+                          Icons.exit_to_app,
+                          () => clearUserId(),
                         ),
                       ],
                     ),
@@ -163,30 +188,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget _buildOrderDetailCard(String title, String value) {
+  Widget _buildAdminOption(
+    BuildContext context,
+    String title,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return Card(
-      elevation: 4,
-      margin: EdgeInsets.only(bottom: 16.0),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Text(
-              '$title: ',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: Text(
-                value,
-                style: TextStyle(fontSize: 16),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
+      margin: EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        leading: Icon(icon, size: 30.0),
+        title: Text(
+          title,
+          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
         ),
+        trailing: Icon(Icons.arrow_forward_ios),
+        onTap: onTap,
       ),
     );
   }

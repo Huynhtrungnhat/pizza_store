@@ -7,80 +7,30 @@ import 'package:pizza_store/models/hoadonModel.dart';
 import 'package:pizza_store/models/khachhnag.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class InvoiceDetailsScreen extends StatefulWidget {
+class InvoiceDetailsScreenkk extends StatefulWidget {
   final int maHoaDon;
   final int makh;
-  final HoaDon order;
-  final Function(String) onUpdateStatus;
 
-  const InvoiceDetailsScreen(
-      {required this.maHoaDon, required this.makh,required this.order,
-    required this.onUpdateStatus, Key? key})
+  const InvoiceDetailsScreenkk(
+      {required this.maHoaDon, required this.makh, Key? key})
       : super(key: key);
 
   @override
-  _InvoiceDetailsScreenState createState() => _InvoiceDetailsScreenState();
+  _InvoiceDetailsScreenkkState createState() => _InvoiceDetailsScreenkkState();
 }
 
-class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
+class _InvoiceDetailsScreenkkState extends State<InvoiceDetailsScreenkk> {
   late Future<List<InvoiceDetail>> _futureInvoiceDetails;
   late Future<KhachHang> _khachHangDetails;
-    final List<String> _statusList = [
-    'Chờ xác nhận',
-    'Đang vận chuyển',
-    'Hoàn thành',
-    'Đã hủy',
-  ];
-    String? userId;
-    late String _selectedStatus;
+    
   @override
   void initState() {
     super.initState();
     _futureInvoiceDetails = fetchInvoiceDetails(widget.maHoaDon);
     _khachHangDetails = fetchKhachHang(widget.makh); 
-     _selectedStatus = _statusList.contains(widget.order.trang_thai)
-      ? widget.order.trang_thai
-      : _statusList.first;
+     
   }
-  Future<void> _updateStatusOnApi(String newStatus) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getString('userId');
-    final url = Uri.parse('${AppConstants.hoadon}/${widget.order.ma_hoa_don}');
 
-    try {
-      final requestBody = jsonEncode({
-        'ma_hoa_don': widget.order.ma_hoa_don,
-        'ma_nhan_vien': userId,
-        'trang_thai': newStatus,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
-
-      final response = await http.put(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: requestBody,
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        setState(() {
-          widget.order.trang_thai = newStatus;
-        });
-        widget.onUpdateStatus(newStatus);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Trạng thái đơn hàng đã được cập nhật $userId.')),
-        );
-        Navigator.pop(context, true);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cập nhật trạng thái thất bại!')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Có lỗi xảy ra khi cập nhật trạng thái. Chi tiết lỗi: $e')),
-      );
-    }
-  }
   Future<KhachHang> fetchKhachHang(int makh) async {
     final response = await http.get(Uri.parse('${AppConstants.khachhang}/$makh'));
 
@@ -138,9 +88,10 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chi tiết hóa đơn'),
+        title: Text('Chi tiết hóa đơn #${widget.maHoaDon}'),
         centerTitle: true,
         backgroundColor: Colors.amber,
+        
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -201,11 +152,10 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         ),
       );
     } else {
-      return Center(child: Text('Không có dữ liệu khách hàng'));
+      return Center(child: Text('Không tìm thấy có dữ liệu khách hàng'));
     }
   },
 ),
-
 
             FutureBuilder<List<InvoiceDetail>>(
               future: _futureInvoiceDetails,
@@ -273,6 +223,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                                 'Số lượng: ${detail.soLuong}',
                                 style: TextStyle(fontSize: 14),
                               ),
+                              
                             ],
                           ),
                         ),
@@ -285,35 +236,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                 }
               },
             ),
-            DropdownButton<String>(
-                value: _selectedStatus,
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    setState(() {
-                      _selectedStatus = newValue;
-                    });
-                  }
-                },
-                items: _statusList.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 10),
-               ElevatedButton(
-                onPressed: () => _updateStatusOnApi(_selectedStatus),
-                child: Text(
-                          'Cập nhật trạng thái',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.green,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-              ),
+            
+   
           ],
         ),
       ),

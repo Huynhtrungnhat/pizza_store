@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:pizza_store/admin/addnhanvien.dart';
 import 'package:pizza_store/admin/addsanpham.dart';
 import 'package:pizza_store/admin/adminscreen.dart';
-import 'package:pizza_store/admin/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkiemtheosdtupdate.dart';
 import 'package:pizza_store/admin/trangQuanLyDonHang.dart';
+import 'package:pizza_store/login/login.dart';
 
 import 'package:pizza_store/login/regisiter.dart';
 import 'package:pizza_store/models/layidnguoidung.dart';
 import 'package:pizza_store/models/sanphamcart.dart';
+import 'package:pizza_store/models/usermodel.dart';
 import 'package:pizza_store/navigationbottom/donhang_page.dart';
 import 'package:pizza_store/home/home_page.dart';
 import 'package:pizza_store/navigationbottom/profile_page.dart';
@@ -16,12 +19,15 @@ import 'package:pizza_store/navigationbottom/shopcash.dart';
 import 'package:pizza_store/screen/Trangcanhan.dart';
 import 'package:pizza_store/admin/adminlistscren.dart';
 import 'package:pizza_store/screen/fechdatakhhpadon.dart';
+import 'package:pizza_store/screen/chitiethoadonme.dart';
 import 'package:pizza_store/screen/listkhuyenmai.dart';
 import 'package:pizza_store/screen/thanhtoankethop.dart';
 import 'package:pizza_store/screen/themkhuyenmai.dart';
+import 'package:pizza_store/screen/trangCTHD%20(1).dart';
 import 'package:pizza_store/screen/trangCTHD.dart';
 import 'package:pizza_store/screen/trangdonhang.dart';
 import 'package:pizza_store/screen/tranggiohang.dart';
+import 'package:pizza_store/screen/trangtimcuakhachhang.dart';
 
 import '../screen/listnhanvien.dart';
 
@@ -53,15 +59,33 @@ class _CurveBarState extends State<CurveBar> {
     final items = [
       const Icon(Icons.home, size: 30),
       const Icon(Icons.search, size: 30),
-      const Icon(Icons.person, size: 30),
       const Icon(Icons.shopping_cart_rounded, size: 30),
+       const Icon(Icons.person, size: 30),
     ];
-
+    
     final screen = [
       detailsanpham(),
-      AdminPage(),
-      userId != null ? UserProfilePage(userId: userId!) : Center(child: Text('Chưa đăng nhập')),
-     // NhanVienListScreen(),
+
+      theodoidonhangcuaban(),
+     timkhtheohdkhmy(),
+     userId != null ? UserProfilePage(userId: userId!) : Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(' Bạn chưa đăng nhập'),
+          const SizedBox(height: 20), 
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()), 
+              );
+            },
+            child: const Text('Đăng nhập'),
+          ),
+        ],
+      ),
+    ),
     ];
 
     return Scaffold(

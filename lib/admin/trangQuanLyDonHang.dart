@@ -1,11 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:pizza_store/admin/trangCTDonHang.dart';
 import 'package:pizza_store/api/controller.dart';
 import 'package:pizza_store/models/hoadonModel.dart';
+import 'package:pizza_store/screen/chitiethoadonme.dart';
 import 'package:pizza_store/screen/productadd.dart';
 
 class QuanLyDonHang extends StatefulWidget {
@@ -144,6 +144,7 @@ class _QuanLyDonHangState extends State<QuanLyDonHang> {
                         children: [
                           Text('Tổng tiền: ${formattedTien} đ'),
                           Text('Trạng thái: ${order.trang_thai}'),
+                          Text('Thanh toán: ${order.pttt}'),
                         ],
                       ),
                       trailing: Icon(Icons.chevron_right),
@@ -151,7 +152,13 @@ class _QuanLyDonHangState extends State<QuanLyDonHang> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => InvoiceDetailScreen(maHoaDon: order.ma_hoa_don)
+                            builder: (context) => InvoiceDetailsScreen(maHoaDon:order.ma_hoa_don ,makh:order.khachHang.maKhachHang ,order: order,
+                              onUpdateStatus: (newStatus) {
+                                setState(() {
+                                  order.trang_thai = newStatus;
+                                });
+                              },
+                            ),
                           ),
                         );
 

@@ -36,7 +36,7 @@ class NhanVien {
       updated_at: json['updated_at'],
     );
   }
-  // Phương thức để chuyển từ NhanVien object sang JSON
+
   Map<String, dynamic> toJson() {
     return {
       'ma_nhan_vien': maNhanVien,

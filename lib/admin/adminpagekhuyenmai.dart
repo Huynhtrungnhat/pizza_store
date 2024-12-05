@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_store/admin/timkhtheohoadon.dart';
+import 'package:pizza_store/admin/khuyemmaiadd.dart';
+import 'package:pizza_store/admin/tim_khach_hang_co_hoa_don/timkhtheohoadon.dart';
 
 import 'package:pizza_store/admin/trangQuanLyDonHang.dart';
 import 'package:pizza_store/screen/listkhuyenmai.dart';
@@ -22,13 +23,13 @@ class Adminpagekhuyenmai extends StatelessWidget {
               context,
               'Cập nhật Trạng thái khuyến mãi ',
               Icons.category,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) =>Addkhuyenmaiad() ),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) =>KhuyenMaiScreen() ),
             ),),
             _buildAdminOption(
               context,
               'Thêm khuyến mãi',
               Icons.shopping_bag,
-              () => Navigator.push(context,MaterialPageRoute(builder: (context) => Addkhuyenmaiad()),
+              () => Navigator.push(context,MaterialPageRoute(builder: (context) => AddKhuyenMaiPage()),
               ),
               ),
            

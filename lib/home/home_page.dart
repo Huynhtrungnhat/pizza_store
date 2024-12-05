@@ -67,6 +67,9 @@ class _detailsanphamState extends State<detailsanpham> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Trang chủ Thực đơn"),
+        centerTitle: true,
+        backgroundColor: Colors.amber,
+
       ),
       body: FutureBuilder<List>(
         future: getData(),

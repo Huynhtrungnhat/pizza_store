@@ -6,6 +6,8 @@ import 'package:pizza_store/screen/editnhanvien.dart';
 import 'package:pizza_store/screen/fechdatakhhpadon.dart';
 import 'package:pizza_store/screen/trangnguoidungphanquyen.dart';
 
+import '../admin/addnhanvien.dart';
+
 class NhanVienListScreen extends StatefulWidget {
   @override
   _NhanVienListScreenState createState() => _NhanVienListScreenState();
@@ -29,6 +31,17 @@ class _NhanVienListScreenState extends State<NhanVienListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Danh sách nhân viên'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ThemNhanVienPage()),
+              );
+            },
+          ),
+        ],
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
@@ -145,6 +158,16 @@ class _NhanVienListScreenState extends State<NhanVienListScreen> {
                             SizedBox(width: 5),
                             Text(
                                 'Giới tính: ${nhanVien.gioiTinh == 1 ? "Nam" : "Nữ"}',
+                                style: TextStyle(fontSize: 16)),
+                          ],
+                        ),
+                        SizedBox(height: 5),
+                        Row(
+                          children: [
+                            Icon(Icons.male, size: 18, color: Colors.grey),
+                            SizedBox(width: 5),
+                            Text(
+                                'Trạng thái: ${nhanVien.trangThai == 1 ? "Hoạt Động" : "Đã Nghĩ"}',
                                 style: TextStyle(fontSize: 16)),
                           ],
                         ),

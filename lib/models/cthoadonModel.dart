@@ -43,4 +43,30 @@ class ChiTietHoaDon {
   }
 }
 
+class InvoiceDetail {
+  final int maChiTietHoaDon;
+  final int maHoaDon;
+  final Product maSanPham;
+  final int soLuong;
+  final String gia;
+
+  InvoiceDetail({
+    required this.maChiTietHoaDon,
+    required this.maHoaDon,
+    required this.maSanPham,
+    required this.soLuong,
+    required this.gia,
+  });
+
+  factory InvoiceDetail.fromJson(Map<String, dynamic> json) {
+    return InvoiceDetail(
+      maChiTietHoaDon: json['ma_chi_tiet_hoa_don'],
+      maHoaDon: json['ma_hoa_don'],
+      maSanPham: Product.fromJson(json['ma_san_pham']),
+      soLuong: json['so_luong'],
+      gia: json['gia'],
+    );
+  }
+}
+
 

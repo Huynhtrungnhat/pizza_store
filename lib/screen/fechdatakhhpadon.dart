@@ -6,19 +6,7 @@ import 'package:pizza_store/models/khuyenmaimodel.dart';
 import 'package:pizza_store/models/nhanvienModel.dart';
 
 class ApiService {
-  Future<Map<String, dynamic>> fetchKhachHangHoaDon() async {
-    final url = Uri.parse('http://192.168.1.10:8000/api/khachhang/khachhanghd/1');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      
-      print('Lỗi: ${response.statusCode}');
-      print('Thông báo lỗi: ${response.body}');
-      throw Exception('Không thể tải dữ liệu khách hàng');
-    }
-  }
+  
   Future<List<NhanVien>> fetchNhanVien() async {
   final response = await http.get(Uri.parse('${AppConstants.nhanvien}'));
 
